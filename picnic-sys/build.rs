@@ -1,3 +1,4 @@
+#[cfg(not(feature = "docs-rs"))]
 #[cfg(feature = "static-fallback")]
 fn download_and_build() {
     let download = librarian::download_or_find_file(
@@ -109,6 +110,12 @@ fn download_and_build() {
     }
 }
 
+#[cfg(feature = "docs-rs")]
+fn main() {
+    // Skip the script when docs are built on docs.rs
+}
+
+#[cfg(not(feature = "docs-rs"))]
 fn main() {
     #[cfg(feature = "system")]
     // Try to find shared library via pkg-config
