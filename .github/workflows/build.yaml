@@ -60,7 +60,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --feature default,static-fallback
+          args: --features default,static-fallback
       - name: Test with all features
         uses: actions-rs/cargo@v1
         with:
