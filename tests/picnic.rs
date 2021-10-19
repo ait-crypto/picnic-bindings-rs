@@ -1,7 +1,7 @@
 #[generic_tests::define]
 mod tests {
     use picnic_bindings::{
-        signature::{Signature, Signer, Verifier},
+        signature::{Signer, Verifier},
         DynamicSignature, DynamicSigningKey, Parameters, SigningKey, VerificationKey,
     };
     use std::convert::TryFrom;
