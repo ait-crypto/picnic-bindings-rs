@@ -14,6 +14,9 @@ categories = ["cryptography"]
 picnic-sys = { version = "3.0", path = "picnic-sys", default-features = false }
 signature = "1.3"
 
+[dev-dependencies]
+generic-tests = "0.1"
+
 [workspace]
 members = ["picnic-sys"]
 

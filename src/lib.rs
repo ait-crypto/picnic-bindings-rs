@@ -28,6 +28,8 @@
 
 use picnic_sys::*;
 pub use signature;
+use std::ffi::CStr;
+use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
 /// Error containing the internal error returned from the Picnic library
@@ -50,6 +52,15 @@ pub trait Parameters {
     const PRIVATE_KEY_SIZE: usize;
     /// size of the serialized public key
     const PUBLIC_KEY_SIZE: usize;
+
+    /// Retrive name of the parameter set
+    fn parameter_name() -> String {
+        unsafe {
+            CStr::from_ptr(picnic_get_param_name(Self::PARAM))
+                .to_string_lossy()
+                .into_owned()
+        }
+    }
 }
 
 #[cfg(feature = "picnic")]
@@ -291,6 +302,7 @@ impl signature::Signature for DynamicSignature {
 }
 
 /// Signing key generic over the parameters
+#[derive(Clone)]
 pub struct SigningKey<P: Parameters> {
     data: picnic_privatekey_t,
     phantom_data: PhantomData<P>,
@@ -371,7 +383,30 @@ where
     }
 }
 
+impl<P> Debug for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
+        fmt.debug_struct(format!("SigningKey<{}>", P::parameter_name()).as_str())
+            .field("data", &self.data)
+            .finish()
+    }
+}
+
+impl<P> PartialEq for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.data.data[..P::PRIVATE_KEY_SIZE] == other.data.data[..P::PRIVATE_KEY_SIZE]
+    }
+}
+
+impl<P> Eq for SigningKey<P> where P: Parameters {}
+
 /// Verification key generic over the parameters
+#[derive(Clone)]
 pub struct VerificationKey<P: Parameters> {
     data: picnic_publickey_t,
     phantom_data: PhantomData<P>,
@@ -411,6 +446,28 @@ where
         }
     }
 }
+
+impl<P> Debug for VerificationKey<P>
+where
+    P: Parameters,
+{
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
+        fmt.debug_struct(format!("VerificationKey<{}>", P::parameter_name()).as_str())
+            .field("data", &self.data)
+            .finish()
+    }
+}
+
+impl<P> PartialEq for VerificationKey<P>
+where
+    P: Parameters,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.data.data[..P::PUBLIC_KEY_SIZE] == other.data.data[..P::PUBLIC_KEY_SIZE]
+    }
+}
+
+impl<P> Eq for VerificationKey<P> where P: Parameters {}
 
 /// Signing key
 pub struct DynamicSigningKey {
@@ -514,26 +571,5 @@ impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
             0 => Ok(()),
             _ => Err(signature::Error::new()), // TODO: forward Error::from(ret)
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::signature::{Signature, Signer, Verifier};
-    use crate::{DynamicSignature, PicnicL1FS, SigningKey};
-
-    #[test]
-    fn sign_and_verify() {
-        let (sk, vk) = SigningKey::<PicnicL1FS>::random().unwrap();
-        let signature = sk.sign("test".as_bytes());
-        vk.verify("test".as_bytes(), &signature).unwrap();
-    }
-
-    #[test]
-    fn sign_serialize_and_verify() {
-        let (sk, vk) = SigningKey::<PicnicL1FS>::random().unwrap();
-        let signature = sk.sign("test".as_bytes());
-        let signature2 = DynamicSignature::from_bytes(signature.as_ref()).unwrap();
-        vk.verify("test".as_bytes(), &signature2).unwrap();
     }
 }
