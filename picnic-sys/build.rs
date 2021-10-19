@@ -1,4 +1,4 @@
-#[cfg(feature = "static")]
+#[cfg(feature = "static-fallback")]
 fn download_and_build() {
     let download = librarian::download_or_find_file(
         "https://github.com/IAIK/Picnic/archive/refs/tags/v3.0.4.tar.gz",
