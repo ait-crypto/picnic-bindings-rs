@@ -1,6 +1,10 @@
+# 3.0.2
+
+* Skip the build when build building for docs.rs
+
 # 3.0.1
 
-* Fix the doc.rs build
+* Fix the docs.rs build
 
 # 3.0.0
 
