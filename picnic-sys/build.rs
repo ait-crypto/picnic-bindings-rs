@@ -36,23 +36,27 @@ fn download_and_build() {
         build.define("WITH_NEON", None);
     }
 
-    let mut files = std::collections::HashSet::from([
-        "bitstream.c",
-        "compat.c",
-        "cpu.c",
-        "io.c",
-        "picnic.c",
-        "picnic_instances.c",
-        "randomness.c",
-        "lowmc.c",
-        "mzd_additional.c",
-        "sha3/KeccakHash.c",
-        "sha3/KeccakSponge.c",
-        "sha3/KeccakSpongetimes4.c",
-        "sha3/KeccakHashtimes4.c",
-        "sha3/opt64/KeccakP-1600-opt64.c",
-        "sha3/opt64/KeccakP-1600-times4-on1.c",
-    ]);
+    let mut files: std::collections::HashSet<&str> = std::collections::HashSet::new();
+    files.extend(
+        [
+            "bitstream.c",
+            "compat.c",
+            "cpu.c",
+            "io.c",
+            "picnic.c",
+            "picnic_instances.c",
+            "randomness.c",
+            "lowmc.c",
+            "mzd_additional.c",
+            "sha3/KeccakHash.c",
+            "sha3/KeccakSponge.c",
+            "sha3/KeccakSpongetimes4.c",
+            "sha3/KeccakHashtimes4.c",
+            "sha3/opt64/KeccakP-1600-opt64.c",
+            "sha3/opt64/KeccakP-1600-times4-on1.c",
+        ]
+        .iter(),
+    );
 
     if cfg!(feature = "picnic") {
         files.extend(
