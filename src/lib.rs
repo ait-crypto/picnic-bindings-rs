@@ -9,6 +9,7 @@
 //!
 //! ## Usage
 //!
+//! Key generation, signing and verification can be implemented as follows:
 //! ```
 //! use picnic_bindings::{PicnicL1FSSigningKey, signature::{Signer, Verifier}};
 //!
@@ -16,6 +17,15 @@
 //! let msg = "some message".as_bytes();
 //! let signature = signing_key.sign(msg);
 //! verification_key.verify(msg, &signature).expect("Verification failed");
+//! Keys and signatures support conversions to and from `&[u8]`. The following code example
+//! demonstrates the necessary steps for [SigningKey]:
+//! ```
+//! use picnic_bindings::{PicnicL1FSSigningKey};
+//! use std::convert::TryFrom;
+//!
+//! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
+//! let signing_key_2 = PicnicL1FSSigningKey::try_from(signing_key.as_ref()).expect("Deserialization failed");
+//! assert_eq!(signing_key, signing_key_2);
 //! ```
 //!
 //! Alternatively:

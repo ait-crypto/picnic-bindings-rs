@@ -59,7 +59,7 @@ mod tests {
     fn serialize_signature<P: Parameters>() {
         let (sk, vk) = SigningKey::<P>::random().unwrap();
         let signature = sk.sign(TEST_MESSAGE);
-        let signature2 = DynamicSignature::from_bytes(signature.as_ref()).unwrap();
+        let signature2 = DynamicSignature::from(signature.as_ref());
         assert_eq!(signature, signature2);
         vk.verify(TEST_MESSAGE, &signature2).unwrap();
     }
