@@ -10,18 +10,16 @@ fn download_and_build() {
         .expect("Failed to extract Picnic source")
         .join("Picnic-3.0.4");
 
+    let target = std::env::var("TARGET").unwrap();
+    let profile = std::env::var("PROFILE").unwrap();
+
     let mut build = cc::Build::new();
     build.static_flag(true);
     build.define("PICNIC_STATIC", None);
     build.include(src.join("sha3"));
     build.include(src.join("sha3/opt64"));
-    match std::env::var("PROFILE") {
-        Ok(v) => {
-            if v == "release" {
-                build.opt_level(3);
-            }
-        }
-        _ => {}
+    if profile == "release" {
+        build.opt_level(3);
     }
 
     if cfg!(target_feature = "sse2") {
@@ -105,6 +103,10 @@ fn download_and_build() {
     build
         .files(files.iter().map(|v| src.join(v)))
         .compile("picnic");
+
+    if target.contains("windows") {
+        println!("cargo:rustc-link-lib=bcrypt");
+    }
 }
 
 fn main() {
