@@ -6,7 +6,7 @@
 //!
 //! ## Usage
 //!
-//! ```no_run
+//! ```
 //! use picnic_bindings::{PicnicL1FSSigningKey, signature::{Signer, Verifier}};
 //!
 //! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
@@ -16,7 +16,7 @@
 //! ```
 //!
 //! Alternatively:
-//! ```no_run
+//! ```
 //! use picnic_bindings::{DynamicSigningKey, PicnicL1FS, Parameters, signature::{Signer, Verifier}};
 //!
 //! let (signing_key, verification_key) = DynamicSigningKey::random(PicnicL1FS::PARAM).expect("Key generation failed");

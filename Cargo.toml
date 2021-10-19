@@ -10,6 +10,9 @@ edition = "2018"
 keywords = ["signatures", "Picnic"]
 categories = ["cryptography"]
 
+[lib]
+doctest = false
+
 [dependencies]
 picnic-sys = { version = "3.0", path = "picnic-sys", default-features = false }
 signature = "1.3"
