@@ -36,6 +36,22 @@ use std::ffi::CStr;
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
 
+// Some helper functions to reduce boiler plate
+
+/// Returns a 0-initialized public key struct since it is not possible to implement the Default trait here.
+fn default_picnic_publickey_t() -> picnic_publickey_t {
+    picnic_publickey_t {
+        data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
+    }
+}
+
+/// Returns a 0-initialized private key struct since it is not possible to implement the Default trait here.
+fn default_picnic_privatekey_t() -> picnic_privatekey_t {
+    picnic_privatekey_t {
+        data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
+    }
+}
+
 /// Error containing the internal error returned from the Picnic library
 #[derive(Debug, Clone)]
 pub struct Error(c_int);
@@ -318,9 +334,7 @@ where
 {
     fn new() -> Self {
         Self {
-            data: picnic_privatekey_t {
-                data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
-            },
+            data: default_picnic_privatekey_t(),
             phantom_data: PhantomData,
         }
     }
@@ -422,9 +436,7 @@ where
 {
     fn new() -> Self {
         Self {
-            data: picnic_publickey_t {
-                data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
-            },
+            data: default_picnic_publickey_t(),
             phantom_data: PhantomData,
         }
     }
@@ -474,6 +486,7 @@ where
 impl<P> Eq for VerificationKey<P> where P: Parameters {}
 
 /// Signing key
+#[derive(Clone, Debug)]
 pub struct DynamicSigningKey {
     data: picnic_privatekey_t,
     params: picnic_params_t, // FIXME: this is already stored in data; re-use that
@@ -482,9 +495,7 @@ pub struct DynamicSigningKey {
 impl DynamicSigningKey {
     fn new(params: picnic_params_t) -> Self {
         Self {
-            data: picnic_privatekey_t {
-                data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
-            },
+            data: default_picnic_privatekey_t(),
             params,
         }
     }
@@ -492,7 +503,7 @@ impl DynamicSigningKey {
     /// Sample a new random signing key and the corresponding verification key
     pub fn random(params: picnic_params_t) -> Result<(Self, DynamicVerificationKey), Error> {
         let mut sk = DynamicSigningKey::new(params);
-        let mut vk = DynamicVerificationKey::new();
+        let mut vk = DynamicVerificationKey::new(params);
 
         let ret = unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data) };
         match ret {
@@ -503,7 +514,7 @@ impl DynamicSigningKey {
 
     /// Get verification key
     pub fn verifying_key(&self) -> Result<DynamicVerificationKey, Error> {
-        let mut vk = DynamicVerificationKey::new();
+        let mut vk = DynamicVerificationKey::new(self.params);
 
         let ret = unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) };
         match ret {
@@ -521,17 +532,29 @@ impl Drop for DynamicSigningKey {
     }
 }
 
+impl PartialEq for DynamicSigningKey {
+    fn eq(&self, other: &Self) -> bool {
+        self.params == other.params && {
+            let size = unsafe { picnic_get_private_key_size(self.params) };
+            self.data.data[..size] == other.data.data[..size]
+        }
+    }
+}
+
+impl Eq for DynamicSigningKey {}
+
 /// Verification key
+#[derive(Clone, Debug)]
 pub struct DynamicVerificationKey {
     data: picnic_publickey_t,
+    params: picnic_params_t, // FIXME: this is already stored in data; re-use that
 }
 
 impl DynamicVerificationKey {
-    fn new() -> Self {
+    fn new(params: picnic_params_t) -> Self {
         Self {
-            data: picnic_publickey_t {
-                data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
-            },
+            data: default_picnic_publickey_t(),
+            params,
         }
     }
 }
@@ -577,3 +600,14 @@ impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
         }
     }
 }
+
+impl PartialEq for DynamicVerificationKey {
+    fn eq(&self, other: &Self) -> bool {
+        self.params == other.params && {
+            let size = unsafe { picnic_get_public_key_size(self.params) };
+            self.data.data[..size] == other.data.data[..size]
+        }
+    }
+}
+
+impl Eq for DynamicVerificationKey {}

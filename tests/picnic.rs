@@ -2,7 +2,7 @@
 mod tests {
     use picnic_bindings::{
         signature::{Signature, Signer, Verifier},
-        DynamicSignature, Parameters, SigningKey,
+        DynamicSignature, DynamicSigningKey, Parameters, SigningKey,
     };
 
     const TEST_MESSAGE: &[u8] = "test message".as_bytes();
@@ -24,14 +24,32 @@ mod tests {
     }
 
     #[test]
+    fn dynamic_keygen<P: Parameters>() {
+        assert!(DynamicSigningKey::random(P::PARAM).is_ok());
+    }
+
+    #[test]
     fn vk_match<P: Parameters>() {
         let (sk, vk) = SigningKey::<P>::random().unwrap();
         assert_eq!(vk, sk.verifying_key().unwrap());
     }
 
     #[test]
+    fn dynamic_vk_match<P: Parameters>() {
+        let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
+        assert_eq!(vk, sk.verifying_key().unwrap());
+    }
+
+    #[test]
     fn sign_and_verify<P: Parameters>() {
         let (sk, vk) = SigningKey::<P>::random().unwrap();
+        let signature = sk.sign(TEST_MESSAGE);
+        vk.verify(TEST_MESSAGE, &signature).unwrap();
+    }
+
+    #[test]
+    fn dynamic_sign_and_verify<P: Parameters>() {
+        let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
         let signature = sk.sign(TEST_MESSAGE);
         vk.verify(TEST_MESSAGE, &signature).unwrap();
     }
