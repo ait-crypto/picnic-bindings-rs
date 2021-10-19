@@ -32,6 +32,7 @@
 
 use picnic_sys::*;
 pub use signature;
+use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::fmt::{Debug, Formatter};
 use std::marker::PhantomData;
@@ -53,7 +54,7 @@ fn default_picnic_privatekey_t() -> picnic_privatekey_t {
 }
 
 /// Error containing the internal error returned from the Picnic library
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Error(c_int);
 
 impl From<c_int> for Error {
@@ -315,9 +316,15 @@ impl AsRef<[u8]> for DynamicSignature {
     }
 }
 
+impl From<&[u8]> for DynamicSignature {
+    fn from(bytes: &[u8]) -> Self {
+        Self { 0: bytes.into() }
+    }
+}
+
 impl signature::Signature for DynamicSignature {
     fn from_bytes(bytes: &[u8]) -> Result<Self, signature::Error> {
-        Ok(DynamicSignature { 0: bytes.into() })
+        Ok(DynamicSignature::from(bytes))
     }
 }
 
@@ -401,6 +408,32 @@ where
     }
 }
 
+impl<P> AsRef<[u8]> for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn as_ref(&self) -> &[u8] {
+        // FIXME: this breaks the abstraction layer
+        &self.data.data[0..P::PRIVATE_KEY_SIZE]
+    }
+}
+
+impl<P> TryFrom<&[u8]> for SigningKey<P>
+where
+    P: Parameters,
+{
+    type Error = Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let mut sk = Self::new();
+        let ret = unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) };
+        match ret {
+            0 => Ok(sk),
+            _ => Err(ret.into()),
+        }
+    }
+}
+
 impl<P> Debug for SigningKey<P>
 where
     P: Parameters,
@@ -459,6 +492,32 @@ where
         match ret {
             0 => Ok(()),
             _ => Err(signature::Error::new()), // TODO: forward Error::from(ret)
+        }
+    }
+}
+
+impl<P> AsRef<[u8]> for VerificationKey<P>
+where
+    P: Parameters,
+{
+    fn as_ref(&self) -> &[u8] {
+        // FIXME: this breaks the abstraction layer
+        &self.data.data[0..P::PUBLIC_KEY_SIZE]
+    }
+}
+
+impl<P> TryFrom<&[u8]> for VerificationKey<P>
+where
+    P: Parameters,
+{
+    type Error = Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let mut vk = Self::new();
+        let ret = unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) };
+        match ret {
+            0 => Ok(vk),
+            _ => Err(ret.into()),
         }
     }
 }

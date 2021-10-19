@@ -2,8 +2,9 @@
 mod tests {
     use picnic_bindings::{
         signature::{Signature, Signer, Verifier},
-        DynamicSignature, DynamicSigningKey, Parameters, SigningKey,
+        DynamicSignature, DynamicSigningKey, Parameters, SigningKey, VerificationKey,
     };
+    use std::convert::TryFrom;
 
     const TEST_MESSAGE: &[u8] = "test message".as_bytes();
 
@@ -61,6 +62,17 @@ mod tests {
         let signature2 = DynamicSignature::from_bytes(signature.as_ref()).unwrap();
         assert_eq!(signature, signature2);
         vk.verify(TEST_MESSAGE, &signature2).unwrap();
+    }
+
+    #[test]
+    fn serialize_keys<P: Parameters>() {
+        let (sk, vk) = SigningKey::<P>::random().unwrap();
+
+        let sk2 = SigningKey::<P>::try_from(sk.as_ref()).unwrap();
+        let vk2 = VerificationKey::<P>::try_from(vk.as_ref()).unwrap();
+
+        assert_eq!(sk, sk2);
+        assert_eq!(vk, vk2)
     }
 
     #[cfg(feature = "picnic")]
