@@ -1,6 +1,6 @@
 [package]
 name = "picnic-sys"
-description = "Bindings for Picnic"
+description = "Declarations for using Picinc's shared library"
 version = "3.0.0"
 authors = ["Sebastian Ramacher <sebastian.ramacher@ait.ac.at>"]
 homepage = "https://microsoft.github.io/Picnic/"
@@ -11,7 +11,7 @@ links = "picnic"
 categories = ["external-ffi-bindings"]
 
 [dependencies]
-libc = "0.2.0"
+libc = "0.2"
 
 [build-dependencies]
 pkg-config = {version = "0.3.0", optional = true}
