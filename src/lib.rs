@@ -4,6 +4,9 @@
 //! quantum computers. This crate provides bindings that implements the traits from the [signature]
 //! crate.
 //!
+//! More information on Picnic is available on the project website:
+//! <https://microsoft.github.io/Picnic/>
+//!
 //! ## Usage
 //!
 //! ```
@@ -45,16 +48,16 @@ impl From<c_int> for Error {
 
 /// Trait to describe Picnic parameters
 pub trait Parameters {
-    /// internal parameter
+    /// Internal parameter
     const PARAM: picnic_params_t;
-    /// max signature size
+    /// Max size of a signature
     const MAX_SIGNATURE_SIZE: usize;
-    /// size of the serialized private key
+    /// Size of the serialized private key
     const PRIVATE_KEY_SIZE: usize;
-    /// size of the serialized public key
+    /// Size of the serialized public key
     const PUBLIC_KEY_SIZE: usize;
 
-    /// Retrive name of the parameter set
+    /// Retrieve name of the parameter set
     fn parameter_name() -> String {
         unsafe {
             CStr::from_ptr(picnic_get_param_name(Self::PARAM))
