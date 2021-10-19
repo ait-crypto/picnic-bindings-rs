@@ -1,10 +1,10 @@
 [package]
-name = "pqcrypto-picnic"
+name = "picnic-bindings"
 description = "Picnic digital signature scheme"
 version = "0.1.0"
 authors = ["Sebastian Ramacher <sebastian.ramacher@ait.ac.at>"]
 homepage = "https://microsoft.github.io/Picnic/"
-repository = "https://github.com/ait-crypto/picnic-rs"
+repository = "https://github.com/ait-crypto/picnic-bindings-rs"
 license = "MIT"
 edition = "2018"
 keywords = ["signatures", "Picnic"]

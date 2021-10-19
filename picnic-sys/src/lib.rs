@@ -1,8 +1,8 @@
-//! # Bindings for Picnic
+//! # Declarations for Picnic's shared library
 //!
-//! This crate provides bindings to call the functions from shared library of the [optimized Picnic
-//! implementation](https://github.com/IAIK/Picnic). More information on Picnic is available on the
-//! project website: https://microsoft.github.io/Picnic/
+//! This crate provides declarations to call the functions from shared library of the [optimized
+//! Picnic implementation](https://github.com/IAIK/Picnic). More information on Picnic is available
+//! on the project website: https://microsoft.github.io/Picnic/
 
 #![allow(non_upper_case_globals, non_camel_case_types)]
 

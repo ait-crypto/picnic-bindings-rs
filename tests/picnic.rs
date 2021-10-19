@@ -1,6 +1,6 @@
 #[generic_tests::define]
 mod tests {
-    use pqcrypto_picnic::{
+    use picnic_bindings::{
         signature::{Signature, Signer, Verifier},
         DynamicSignature, Parameters, SigningKey,
     };
@@ -8,15 +8,15 @@ mod tests {
     const TEST_MESSAGE: &[u8] = "test message".as_bytes();
 
     #[cfg(feature = "picnic")]
-    use pqcrypto_picnic::{
+    use picnic_bindings::{
         PicnicL1FS, PicnicL1Full, PicnicL3FS, PicnicL3Full, PicnicL5FS, PicnicL5Full,
     };
 
     #[cfg(feature = "unruh-transform")]
-    use pqcrypto_picnic::{PicnicL1UR, PicnicL3UR, PicnicL5UR};
+    use picnic_bindings::{PicnicL1UR, PicnicL3UR, PicnicL5UR};
 
     #[cfg(feature = "picnic3")]
-    use pqcrypto_picnic::{Picnic3L1, Picnic3L3, Picnic3L5};
+    use picnic_bindings::{Picnic3L1, Picnic3L3, Picnic3L5};
 
     #[test]
     fn keygen<P: Parameters>() {

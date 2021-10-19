@@ -1,12 +1,13 @@
-//! # Picnic: Post-Quantum Signatures
+//! # Bindings for Picnic: Post-Quantum Signatures
 //!
 //! The Picnic signature scheme is a family of digital signature schemes secure against attacks by
-//! quantum computers.
+//! quantum computers. This crate provides bindings that implements the traits from the [signature]
+//! crate.
 //!
 //! ## Usage
 //!
 //! ```no_run
-//! use pqcrypto_picnic::{PicnicL1FSSigningKey, signature::{Signer, Verifier}};
+//! use picnic_bindings::{PicnicL1FSSigningKey, signature::{Signer, Verifier}};
 //!
 //! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
 //! let msg = "some message".as_bytes();
@@ -16,7 +17,7 @@
 //!
 //! Alternatively:
 //! ```no_run
-//! use pqcrypto_picnic::{DynamicSigningKey, PicnicL1FS, Parameters, signature::{Signer, Verifier}};
+//! use picnic_bindings::{DynamicSigningKey, PicnicL1FS, Parameters, signature::{Signer, Verifier}};
 //!
 //! let (signing_key, verification_key) = DynamicSigningKey::random(PicnicL1FS::PARAM).expect("Key generation failed");
 //! let msg = "some message".as_bytes();
