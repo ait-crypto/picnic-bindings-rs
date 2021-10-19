@@ -25,3 +25,6 @@ picnic3 = []
 unruh-transform = ["picnic"]
 system = ["pkg-config"]
 static-fallback = ["cc", "librarian"]
+
+[package.metadata.docs.rs]
+all-features = true
