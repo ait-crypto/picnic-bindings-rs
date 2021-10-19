@@ -121,6 +121,8 @@ extern "system" {
         privatekey: *const picnic_privatekey_t,
         publickey: *mut picnic_publickey_t,
     ) -> c_int;
+    pub fn picnic_get_private_key_param(privatekey: *const picnic_privatekey_t) -> picnic_params_t;
+    pub fn picnic_get_public_key_param(publickey: *const picnic_publickey_t) -> picnic_params_t;
 }
 
 #[cfg(test)]
@@ -139,6 +141,8 @@ mod tests {
                 data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
             };
             assert_eq!(picnic_keygen(params, &mut pk, &mut sk), 0);
+            assert_eq!(picnic_get_private_key_param(&sk), params);
+            assert_eq!(picnic_get_public_key_param(&pk), params);
 
             let mut length: size_t = picnic_signature_size(params);
             assert!(length > 0);
