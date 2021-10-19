@@ -410,7 +410,7 @@ where
                 signature.resize(length, 0);
                 Ok(DynamicSignature { 0: signature })
             }
-            _ => Err(signature::Error::new()), // TODO: forward Error::from(ret)
+            _ => Err(signature::Error::new()),
         }
     }
 }
@@ -509,7 +509,7 @@ where
         };
         match ret {
             0 => Ok(()),
-            _ => Err(signature::Error::new()), // TODO: forward Error::from(ret)
+            _ => Err(signature::Error::new()),
         }
     }
 }
@@ -660,7 +660,7 @@ impl signature::Signer<DynamicSignature> for DynamicSigningKey {
                 signature.resize(length, 0);
                 Ok(DynamicSignature { 0: signature })
             }
-            _ => Err(signature::Error::new()), // TODO: forward Error::from(ret)
+            _ => Err(signature::Error::new()),
         }
     }
 }
@@ -678,7 +678,7 @@ impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
         };
         match ret {
             0 => Ok(()),
-            _ => Err(signature::Error::new()), // TODO: forward Error::from(ret)
+            _ => Err(signature::Error::new()),
         }
     }
 }
