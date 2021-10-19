@@ -92,6 +92,10 @@ jobs:
           toolchain: stable
           override: true
           components: clippy
+      - name: Install dependencies
+        run: |
+          sudo add-apt-repository -u -y ppa:s-ramacher/picnic
+          sudo apt install libpicnic-dev pkg-config
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
