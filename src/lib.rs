@@ -566,21 +566,19 @@ impl<P> Eq for VerificationKey<P> where P: Parameters {}
 #[derive(Clone, Debug)]
 pub struct DynamicSigningKey {
     data: picnic_privatekey_t,
-    params: picnic_params_t, // FIXME: this is already stored in data; re-use that
 }
 
 impl DynamicSigningKey {
-    fn new(params: picnic_params_t) -> Self {
+    fn new() -> Self {
         Self {
             data: default_picnic_privatekey_t(),
-            params,
         }
     }
 
     /// Sample a new random signing key and the corresponding verification key
     pub fn random(params: picnic_params_t) -> Result<(Self, DynamicVerificationKey), Error> {
-        let mut sk = DynamicSigningKey::new(params);
-        let mut vk = DynamicVerificationKey::new(params);
+        let mut sk = DynamicSigningKey::new();
+        let mut vk = DynamicVerificationKey::new();
 
         let ret = unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data) };
         match ret {
@@ -589,15 +587,19 @@ impl DynamicSigningKey {
         }
     }
 
-    /// Get verification key
+    /// Return corresponding verification key
     pub fn verifying_key(&self) -> Result<DynamicVerificationKey, Error> {
-        let mut vk = DynamicVerificationKey::new(self.params);
+        let mut vk = DynamicVerificationKey::new();
 
         let ret = unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) };
         match ret {
             0 => Ok(vk),
             _ => Err(ret.into()),
         }
+    }
+
+    fn param(&self) -> picnic_params_t {
+        unsafe { picnic_get_private_key_param(&self.data) }
     }
 }
 
@@ -611,8 +613,9 @@ impl Drop for DynamicSigningKey {
 
 impl PartialEq for DynamicSigningKey {
     fn eq(&self, other: &Self) -> bool {
-        self.params == other.params && {
-            let size = unsafe { picnic_get_private_key_size(self.params) };
+        let self_param = self.param();
+        self_param == other.param() && {
+            let size = unsafe { picnic_get_private_key_size(self_param) };
             self.data.data[..size] == other.data.data[..size]
         }
     }
@@ -624,21 +627,23 @@ impl Eq for DynamicSigningKey {}
 #[derive(Clone, Debug)]
 pub struct DynamicVerificationKey {
     data: picnic_publickey_t,
-    params: picnic_params_t, // FIXME: this is already stored in data; re-use that
 }
 
 impl DynamicVerificationKey {
-    fn new(params: picnic_params_t) -> Self {
+    fn new() -> Self {
         Self {
             data: default_picnic_publickey_t(),
-            params,
         }
+    }
+
+    fn param(&self) -> picnic_params_t {
+        unsafe { picnic_get_public_key_param(&self.data) }
     }
 }
 
 impl signature::Signer<DynamicSignature> for DynamicSigningKey {
     fn try_sign(&self, msg: &[u8]) -> Result<DynamicSignature, signature::Error> {
-        let mut length = unsafe { picnic_signature_size(self.params) };
+        let mut length = unsafe { picnic_signature_size(self.param()) };
         let mut signature = vec![0; length];
 
         let ret = unsafe {
@@ -680,8 +685,9 @@ impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
 
 impl PartialEq for DynamicVerificationKey {
     fn eq(&self, other: &Self) -> bool {
-        self.params == other.params && {
-            let size = unsafe { picnic_get_public_key_size(self.params) };
+        let self_param = self.param();
+        self_param == other.param() && {
+            let size = unsafe { picnic_get_public_key_size(self_param) };
             self.data.data[..size] == other.data.data[..size]
         }
     }
