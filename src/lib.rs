@@ -51,8 +51,9 @@
 use picnic_sys::*;
 pub use signature;
 use std::convert::TryFrom;
+use std::error;
 use std::ffi::CStr;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::marker::PhantomData;
 
 // Some helper functions to reduce boiler plate
@@ -73,11 +74,52 @@ fn default_picnic_privatekey_t() -> picnic_privatekey_t {
 
 /// Error containing the internal error returned from the Picnic library
 #[derive(Debug, Copy, Clone)]
-pub struct Error(c_int);
+pub struct LibraryError(c_int);
 
-impl From<c_int> for Error {
+impl From<c_int> for LibraryError {
     fn from(value: c_int) -> Self {
         Self { 0: value }
+    }
+}
+
+impl Display for LibraryError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "picnic library call failed with error code {}", self.0)
+    }
+}
+
+impl error::Error for LibraryError {}
+
+/// Error type for all errors except for those defined by the traits from [signature]
+#[derive(Debug, Copy, Clone)]
+pub enum Error {
+    /// An error returned by the picnic library
+    Library(LibraryError),
+    /// Deserializing encountered an unexpected parameter
+    UnexpectedParameter,
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            Error::UnexpectedParameter => write!(f, "unexpected parameter encountered"),
+            Error::Library(ref e) => write!(f, "{}", e),
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match *self {
+            Error::UnexpectedParameter => None,
+            Error::Library(ref e) => Some(e),
+        }
+    }
+}
+
+impl From<LibraryError> for Error {
+    fn from(library_error: LibraryError) -> Self {
+        Error::Library(library_error)
     }
 }
 
@@ -372,7 +414,7 @@ where
         let ret = unsafe { picnic_keygen(P::PARAM, &mut vk.data, &mut sk.data) };
         match ret {
             0 => Ok((sk, vk)),
-            _ => Err(ret.into()),
+            _ => Err(LibraryError::from(ret).into()),
         }
     }
 
@@ -383,7 +425,7 @@ where
         let ret = unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) };
         match ret {
             0 => Ok(vk),
-            _ => Err(ret.into()),
+            _ => Err(LibraryError::from(ret).into()),
         }
     }
 }
@@ -445,9 +487,13 @@ where
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut sk = Self::new();
         let ret = unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) };
-        match ret {
-            0 => Ok(sk),
-            _ => Err(ret.into()),
+        if ret != 0 {
+            return Err(LibraryError::from(ret).into());
+        }
+
+        match unsafe { picnic_get_private_key_param(&sk.data) } == P::PARAM {
+            true => Ok(sk),
+            false => Err(Error::UnexpectedParameter),
         }
     }
 }
@@ -533,9 +579,13 @@ where
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut vk = Self::new();
         let ret = unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) };
-        match ret {
-            0 => Ok(vk),
-            _ => Err(ret.into()),
+        if ret != 0 {
+            return Err(LibraryError::from(ret).into());
+        }
+
+        match unsafe { picnic_get_public_key_param(&vk.data) } == P::PARAM {
+            true => Ok(vk),
+            false => Err(Error::UnexpectedParameter),
         }
     }
 }
@@ -583,7 +633,7 @@ impl DynamicSigningKey {
         let ret = unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data) };
         match ret {
             0 => Ok((sk, vk)),
-            _ => Err(ret.into()),
+            _ => Err(LibraryError::from(ret).into()),
         }
     }
 
@@ -594,7 +644,7 @@ impl DynamicSigningKey {
         let ret = unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) };
         match ret {
             0 => Ok(vk),
-            _ => Err(ret.into()),
+            _ => Err(LibraryError::from(ret).into()),
         }
     }
 
@@ -694,3 +744,20 @@ impl PartialEq for DynamicVerificationKey {
 }
 
 impl Eq for DynamicVerificationKey {}
+
+#[cfg(test)]
+mod test {
+    #[cfg(feature = "picnic")]
+    use crate::{PicnicL1FSSigningKey, PicnicL1FullSigningKey, PicnicL1FullVerificationKey};
+    #[cfg(feature = "picnic")]
+    use std::convert::TryFrom;
+
+    #[cfg(feature = "picnic")]
+    #[test]
+    fn serialization_param_mismatch() {
+        let (sk1, vk1) = PicnicL1FSSigningKey::random().expect("unable to generate keys");
+        PicnicL1FullSigningKey::try_from(sk1.as_ref()).expect_err("deserialization did not fail");
+        PicnicL1FullVerificationKey::try_from(vk1.as_ref())
+            .expect_err("deserialization did not fail");
+    }
+}
