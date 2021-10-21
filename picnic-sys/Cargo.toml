@@ -16,15 +16,14 @@ libc = "0.2"
 [build-dependencies]
 pkg-config = {version = "0.3", optional = true}
 cc = {version = "1", optional = true, features = ["parallel"]}
-librarian = {version = "0.2", optional = true}
 
 [features]
-default = ["system", "picnic", "picnic3"]
+default = ["system", "static-fallback", "picnic", "picnic3"]
 picnic = []
 picnic3 = []
 unruh-transform = ["picnic"]
 system = ["pkg-config"]
-static-fallback = ["cc", "librarian"]
+static-fallback = ["cc"]
 docs-rs = []
 
 [package.metadata.docs.rs]

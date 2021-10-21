@@ -1,16 +1,7 @@
 #[cfg(not(feature = "docs-rs"))]
 #[cfg(feature = "static-fallback")]
 fn download_and_build() {
-    let download = librarian::download_or_find_file(
-        "https://github.com/IAIK/Picnic/archive/refs/tags/v3.0.5.tar.gz",
-        None,
-    )
-    .expect("Failed to download Picnic");
-
-    let src = librarian::extract_archive(&download, None)
-        .expect("Failed to extract Picnic source")
-        .join("Picnic-3.0.5");
-
+    let src = std::path::Path::new("Picnic");
     let target = std::env::var("TARGET").unwrap();
     let profile = std::env::var("PROFILE").unwrap();
 
