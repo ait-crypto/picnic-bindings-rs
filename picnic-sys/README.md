@@ -6,4 +6,4 @@ Per default, it is required that Picnic's shared library is installed. To fall b
 
 ## License
 
-This crate is licensed under the MIT license.
+This crate is licensed under the MIT license. For Picnic's license, please check its [license file](https://github.com/IAIK/Picnic/blob/master/LICENSE).
