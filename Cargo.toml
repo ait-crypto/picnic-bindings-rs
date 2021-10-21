@@ -8,7 +8,7 @@ repository = "https://github.com/ait-crypto/picnic-bindings-rs"
 license = "MIT"
 edition = "2018"
 keywords = ["signatures", "Picnic"]
-categories = ["cryptography"]
+categories = ["cryptography", "api-bindings"]
 
 [dependencies]
 picnic-sys = { version = "3.0.4", path = "picnic-sys", default-features = false }
