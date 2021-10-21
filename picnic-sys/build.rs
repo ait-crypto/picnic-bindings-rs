@@ -8,6 +8,8 @@ fn download_and_build() {
     let mut build = cc::Build::new();
     build.static_flag(true);
     build.define("PICNIC_STATIC", None);
+    build.define("NDEBUG", None);
+    build.define("WITH_KECCAK_X4", None);
     build.include(src.join("sha3"));
     build.include(src.join("sha3/opt64"));
     if profile == "release" {
