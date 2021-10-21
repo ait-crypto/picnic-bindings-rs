@@ -436,7 +436,7 @@ where
 {
     fn try_sign(&self, msg: &[u8]) -> Result<DynamicSignature, signature::Error> {
         let mut signature = vec![0; P::MAX_SIGNATURE_SIZE];
-        let mut length: size_t = P::MAX_SIGNATURE_SIZE;
+        let mut length = P::MAX_SIGNATURE_SIZE;
 
         let ret = unsafe {
             picnic_sign(
