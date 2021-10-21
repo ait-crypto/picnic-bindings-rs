@@ -21,7 +21,7 @@ generic-tests = "0.1"
 members = ["picnic-sys"]
 
 [features]
-default = ["system", "picnic", "picnic3"]
+default = ["system", "static-fallback", "picnic", "picnic3"]
 picnic = ["picnic-sys/picnic"]
 picnic3 = ["picnic-sys/picnic3"]
 unruh-transform = ["picnic-sys/unruh-transform"]
