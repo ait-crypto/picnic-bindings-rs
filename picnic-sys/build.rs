@@ -22,7 +22,7 @@ fn download_and_build() {
         }
     }
     if cfg!(target_feature = "neon") {
-        build.define("WITH_SIMD_OPT", None);
+        build.define("WITH_OPT", None);
         build.define("WITH_NEON", None);
     }
 
