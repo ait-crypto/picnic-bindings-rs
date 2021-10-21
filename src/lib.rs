@@ -152,8 +152,8 @@ pub struct PicnicL1FS {}
 impl Parameters for PicnicL1FS {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L1_FS;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L1_FS;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L1_FS;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L1_FS;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_FS;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_FS;
 }
 
 #[cfg(feature = "unruh-transform")]
@@ -164,8 +164,8 @@ pub struct PicnicL1UR {}
 impl Parameters for PicnicL1UR {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L1_UR;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L1_UR;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L1_UR;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L1_UR;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_UR;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_UR;
 }
 
 #[cfg(feature = "picnic")]
@@ -176,8 +176,8 @@ pub struct PicnicL1Full {}
 impl Parameters for PicnicL1Full {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L1_full;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L1_full;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L1_full;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L1_full;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_full;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_full;
 }
 
 #[cfg(feature = "picnic")]
@@ -188,8 +188,8 @@ pub struct PicnicL3FS {}
 impl Parameters for PicnicL3FS {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L3_FS;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L3_FS;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L3_FS;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L3_FS;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_FS;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_FS;
 }
 
 #[cfg(feature = "unruh-transform")]
@@ -200,8 +200,8 @@ pub struct PicnicL3UR {}
 impl Parameters for PicnicL3UR {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L3_UR;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L3_UR;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L3_UR;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L3_UR;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_UR;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_UR;
 }
 
 #[cfg(feature = "picnic")]
@@ -212,8 +212,8 @@ pub struct PicnicL3Full {}
 impl Parameters for PicnicL3Full {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L3_full;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L3_full;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L3_full;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L3_full;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_full;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_full;
 }
 
 #[cfg(feature = "picnic")]
@@ -224,8 +224,8 @@ pub struct PicnicL5FS {}
 impl Parameters for PicnicL5FS {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L5_FS;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L5_FS;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L5_FS;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L5_FS;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_FS;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_FS;
 }
 
 #[cfg(feature = "unruh-transform")]
@@ -236,8 +236,8 @@ pub struct PicnicL5UR {}
 impl Parameters for PicnicL5UR {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L5_UR;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L5_UR;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L5_UR;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L5_UR;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_UR;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_UR;
 }
 
 #[cfg(feature = "picnic")]
@@ -248,8 +248,8 @@ pub struct PicnicL5Full {}
 impl Parameters for PicnicL5Full {
     const PARAM: picnic_params_t = picnic_params_t::Picnic_L5_full;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L5_full;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L5_full;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L5_full;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_full;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_full;
 }
 
 #[cfg(feature = "picnic3")]
@@ -260,8 +260,8 @@ pub struct Picnic3L1 {}
 impl Parameters for Picnic3L1 {
     const PARAM: picnic_params_t = picnic_params_t::Picnic3_L1;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic3_L1;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic3_L1;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic3_L1;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic3_L1;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic3_L1;
 }
 
 #[cfg(feature = "picnic3")]
@@ -272,8 +272,8 @@ pub struct Picnic3L3 {}
 impl Parameters for Picnic3L3 {
     const PARAM: picnic_params_t = picnic_params_t::Picnic3_L3;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic3_L3;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic3_L3;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic3_L3;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic3_L3;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic3_L3;
 }
 
 #[cfg(feature = "picnic3")]
@@ -284,8 +284,8 @@ pub struct Picnic3L5 {}
 impl Parameters for Picnic3L5 {
     const PARAM: picnic_params_t = picnic_params_t::Picnic3_L5;
     const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic3_L5;
-    const PRIVATE_KEY_SIZE: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic3_L5;
-    const PUBLIC_KEY_SIZE: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic3_L5;
+    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic3_L5;
+    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic3_L5;
 }
 
 #[cfg(feature = "picnic")]
