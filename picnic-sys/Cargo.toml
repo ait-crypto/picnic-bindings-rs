@@ -12,7 +12,7 @@ categories = ["external-ffi-bindings"]
 exclude = ["Picnic/tests"]
 
 [dependencies]
-libc = "0.2"
+libc = {version = "0.2", default-features = false}
 
 [build-dependencies]
 pkg-config = {version = "0.3", optional = true}
