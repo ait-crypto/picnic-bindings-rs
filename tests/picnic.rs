@@ -2,7 +2,8 @@
 mod tests {
     use picnic_bindings::{
         signature::{Signer, Verifier},
-        DynamicSignature, DynamicSigningKey, Parameters, SigningKey, VerificationKey,
+        DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, SigningKey,
+        VerificationKey,
     };
     use std::convert::TryFrom;
 
@@ -73,6 +74,37 @@ mod tests {
 
         assert_eq!(sk, sk2);
         assert_eq!(vk, vk2)
+    }
+
+    #[test]
+    fn dynamic_serialize_keys<P: Parameters>() {
+        let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
+
+        let sk2 = DynamicSigningKey::try_from(sk.as_ref()).unwrap();
+        let vk2 = DynamicVerificationKey::try_from(vk.as_ref()).unwrap();
+
+        assert_eq!(sk, sk2);
+        assert_eq!(vk, vk2)
+    }
+
+    #[test]
+    fn serialize_keys_dynamic_and_back<P: Parameters>() {
+        let (sk1, vk1) = SigningKey::<P>::random().unwrap();
+
+        let sk2 = DynamicSigningKey::try_from(sk1.as_ref()).unwrap();
+        let vk2 = DynamicVerificationKey::try_from(vk1.as_ref()).unwrap();
+
+        let sk3 = SigningKey::<P>::try_from(sk2.as_ref()).unwrap();
+        let vk3 = VerificationKey::<P>::try_from(vk2.as_ref()).unwrap();
+
+        assert_eq!(sk1, sk3);
+        assert_eq!(vk1, vk3);
+
+        let signature1 = sk1.sign(TEST_MESSAGE);
+        let signature2 = sk2.sign(TEST_MESSAGE);
+
+        vk1.verify(TEST_MESSAGE, &signature2).unwrap();
+        vk2.verify(TEST_MESSAGE, &signature1).unwrap();
     }
 
     #[cfg(feature = "picnic")]

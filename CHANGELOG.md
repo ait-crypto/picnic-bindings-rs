@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2021-10-XX)
+
+* Provide conversion from/to `&[u8]` for `DynamicSigningKey` and `DynamicVerificationKey`.
+
 ## 0.2 (2021-10-21)
 
 * Add `static-fallback` to the default features.
@@ -7,7 +11,7 @@
 
 ## 0.1.1 (2021-10-20)
 
-* Provide conversion from/to `&[u8]` for `DynamicSigningKey` and `DynamicVerificationKey`.
+* Remove superfluous parameter
 * Require `picnic-sys` 3.0.3.
 
 ## 0.1 (2021-10-19)
