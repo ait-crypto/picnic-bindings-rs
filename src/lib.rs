@@ -48,6 +48,10 @@
 
 #![warn(missing_docs)]
 
+// If neither is specified, the crate is essentially empty.
+#[cfg(all(not(feature = "picnic"), not(feature = "picnic3")))]
+compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
+
 use picnic_sys::*;
 pub use signature;
 use std::convert::TryFrom;
@@ -56,7 +60,7 @@ use std::ffi::CStr;
 use std::fmt::{Debug, Display, Formatter};
 use std::marker::PhantomData;
 
-// Some helper functions to reduce boiler plate
+// Some helper functions to reduce boiler plate code
 
 /// Returns a 0-initialized public key struct since it is not possible to implement the Default trait here.
 fn default_picnic_publickey_t() -> picnic_publickey_t {
