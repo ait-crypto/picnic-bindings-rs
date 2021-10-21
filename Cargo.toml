@@ -27,3 +27,6 @@ picnic3 = ["picnic-sys/picnic3"]
 unruh-transform = ["picnic-sys/unruh-transform"]
 system = ["picnic-sys/system"]
 static-fallback = ["picnic-sys/static-fallback"]
+
+[package.metadata.docs.rs]
+all-features = true
