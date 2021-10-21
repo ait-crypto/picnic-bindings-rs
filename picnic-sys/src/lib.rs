@@ -35,6 +35,30 @@ pub const PICNIC_SIGNATURE_SIZE_Picnic_L3_full: usize = 71179;
 pub const PICNIC_SIGNATURE_SIZE_Picnic_L5_full: usize = 126286;
 pub const PICNIC_MAX_PUBLICKEY_SIZE: usize = 65;
 pub const PICNIC_MAX_PRIVATEKEY_SIZE: usize = 97;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_FS: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L1_FS;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_UR: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L1_UR;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_FS: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L3_FS;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_UR: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L3_UR;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_FS: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L5_FS;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_UR: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L5_UR;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic3_L1: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic3_L1;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic3_L3: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic3_L3;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic3_L5: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic3_L5;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_full: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L1_full;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_full: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L3_full;
+pub const PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_full: usize = 1 + 3 * LOWMC_BLOCK_SIZE_Picnic_L5_full;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_FS: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L1_FS;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_UR: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L1_UR;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_FS: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L3_FS;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_UR: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L3_UR;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_FS: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L5_FS;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_UR: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L5_UR;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic3_L1: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic3_L1;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic3_L3: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic3_L3;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic3_L5: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic3_L5;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_full: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L1_full;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_full: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L3_full;
+pub const PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_full: usize = 1 + 2 * LOWMC_BLOCK_SIZE_Picnic_L5_full;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -71,7 +95,6 @@ extern "system" {
     pub fn picnic_get_param_name(parameters: picnic_params_t) -> *const c_char;
     pub fn picnic_get_private_key_size(parameters: picnic_params_t) -> size_t;
     pub fn picnic_get_public_key_size(parameters: picnic_params_t) -> size_t;
-
     pub fn picnic_keygen(
         parameters: picnic_params_t,
         pk: *mut picnic_publickey_t,
