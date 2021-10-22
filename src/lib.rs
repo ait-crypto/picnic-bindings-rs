@@ -59,19 +59,34 @@ use picnic_sys::*;
 pub use signature::{self, Error};
 use std::ffi::CStr;
 
+/// Newtype pattern for `picnic_privatekey_t`
+#[derive(Clone, Debug)]
+struct PrivateKey(picnic_privatekey_t);
+
+impl Default for PrivateKey {
+    fn default() -> Self {
+        Self {
+            0: picnic_privatekey_t {
+                data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
+            },
+        }
+    }
+}
+
+impl Drop for PrivateKey {
+    fn drop(&mut self) {
+        unsafe {
+            picnic_clear_private_key(&mut self.0);
+        }
+    }
+}
+
 // Some helper functions to reduce boiler plate code
 
 /// Returns a 0-initialized public key struct since it is not possible to implement the Default trait here.
 fn default_picnic_publickey_t() -> picnic_publickey_t {
     picnic_publickey_t {
         data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
-    }
-}
-
-/// Returns a 0-initialized private key struct since it is not possible to implement the Default trait here.
-fn default_picnic_privatekey_t() -> picnic_privatekey_t {
-    picnic_privatekey_t {
-        data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
     }
 }
 
@@ -361,7 +376,7 @@ impl signature::Signature for DynamicSignature {
 /// Signing key generic over the parameters
 #[derive(Clone)]
 pub struct SigningKey<P: Parameters> {
-    data: picnic_privatekey_t,
+    data: PrivateKey,
     phantom_data: PhantomData<P>,
 }
 
@@ -371,7 +386,7 @@ where
 {
     fn new() -> Self {
         Self {
-            data: default_picnic_privatekey_t(),
+            data: Default::default(),
             phantom_data: PhantomData,
         }
     }
@@ -381,7 +396,7 @@ where
         let mut sk = SigningKey::new();
         let mut vk = VerificationKey::new();
 
-        match unsafe { picnic_keygen(P::PARAM, &mut vk.data, &mut sk.data) } {
+        match unsafe { picnic_keygen(P::PARAM, &mut vk.data, &mut sk.data.0) } {
             0 => Ok((sk, vk)),
             _ => Err(Error::new()),
         }
@@ -397,7 +412,7 @@ where
     fn verifier(&self) -> Result<Self::Verifier, Error> {
         let mut vk = VerificationKey::new();
 
-        match unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) } {
+        match unsafe { picnic_sk_to_pk(&self.data.0, &mut vk.data) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
@@ -414,7 +429,7 @@ where
 
         match unsafe {
             picnic_sign(
-                &self.data,
+                &self.data.0,
                 msg.as_ptr(),
                 msg.len(),
                 signature.as_mut_ptr(),
@@ -439,24 +454,13 @@ where
     }
 }
 
-impl<P> Drop for SigningKey<P>
-where
-    P: Parameters,
-{
-    fn drop(&mut self) {
-        unsafe {
-            picnic_clear_private_key(&mut self.data);
-        }
-    }
-}
-
 impl<P> AsRef<[u8]> for SigningKey<P>
 where
     P: Parameters,
 {
     fn as_ref(&self) -> &[u8] {
         // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_private_key
-        &self.data.data[0..P::PRIVATE_KEY_SIZE]
+        &self.data.0.data[0..P::PRIVATE_KEY_SIZE]
     }
 }
 
@@ -468,11 +472,11 @@ where
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut sk = Self::new();
-        if unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) } != 0 {
+        if unsafe { picnic_read_private_key(&mut sk.data.0, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
-        match unsafe { picnic_get_private_key_param(&sk.data) } == P::PARAM {
+        match unsafe { picnic_get_private_key_param(&sk.data.0) } == P::PARAM {
             true => Ok(sk),
             false => Err(Self::Error::new()),
         }
@@ -495,7 +499,7 @@ where
     P: Parameters,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.data.data[..P::PRIVATE_KEY_SIZE] == other.data.data[..P::PRIVATE_KEY_SIZE]
+        self.data.0.data[..P::PRIVATE_KEY_SIZE] == other.data.0.data[..P::PRIVATE_KEY_SIZE]
     }
 }
 
@@ -603,13 +607,13 @@ impl<P> Eq for VerificationKey<P> where P: Parameters {}
 /// Signing key
 #[derive(Clone, Debug)]
 pub struct DynamicSigningKey {
-    data: picnic_privatekey_t,
+    data: PrivateKey,
 }
 
 impl DynamicSigningKey {
     fn new() -> Self {
         Self {
-            data: default_picnic_privatekey_t(),
+            data: Default::default(),
         }
     }
 
@@ -618,14 +622,14 @@ impl DynamicSigningKey {
         let mut sk = DynamicSigningKey::new();
         let mut vk = DynamicVerificationKey::new();
 
-        match unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data) } {
+        match unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data.0) } {
             0 => Ok((sk, vk)),
             _ => Err(Error::new()),
         }
     }
 
     fn param(&self) -> picnic_params_t {
-        unsafe { picnic_get_private_key_param(&self.data) }
+        unsafe { picnic_get_private_key_param(&self.data.0) }
     }
 }
 
@@ -635,7 +639,7 @@ impl Signer<DynamicSignature> for DynamicSigningKey {
     fn verifier(&self) -> Result<Self::Verifier, Error> {
         let mut vk = DynamicVerificationKey::new();
 
-        match unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) } {
+        match unsafe { picnic_sk_to_pk(&self.data.0, &mut vk.data) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
@@ -649,7 +653,7 @@ impl signature::Signer<DynamicSignature> for DynamicSigningKey {
 
         match unsafe {
             picnic_sign(
-                &self.data,
+                &self.data.0,
                 msg.as_ptr(),
                 msg.len(),
                 signature.as_mut_ptr(),
@@ -674,7 +678,7 @@ impl SerializedSize for DynamicSigningKey {
 impl AsRef<[u8]> for DynamicSigningKey {
     fn as_ref(&self) -> &[u8] {
         // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_private_key
-        &self.data.data[0..self.serialized_size()]
+        &self.data.0.data[0..self.serialized_size()]
     }
 }
 
@@ -683,7 +687,7 @@ impl TryFrom<&[u8]> for DynamicSigningKey {
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut sk = Self::new();
-        if unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) } != 0 {
+        if unsafe { picnic_read_private_key(&mut sk.data.0, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
@@ -694,20 +698,12 @@ impl TryFrom<&[u8]> for DynamicSigningKey {
     }
 }
 
-impl Drop for DynamicSigningKey {
-    fn drop(&mut self) {
-        unsafe {
-            picnic_clear_private_key(&mut self.data);
-        }
-    }
-}
-
 impl PartialEq for DynamicSigningKey {
     fn eq(&self, other: &Self) -> bool {
         let self_param = self.param();
         self_param == other.param() && {
             let size = unsafe { picnic_get_private_key_size(self_param) };
-            self.data.data[..size] == other.data.data[..size]
+            self.data.0.data[..size] == other.data.0.data[..size]
         }
     }
 }
