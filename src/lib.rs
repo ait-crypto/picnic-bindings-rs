@@ -81,12 +81,17 @@ impl Drop for PrivateKey {
     }
 }
 
-// Some helper functions to reduce boiler plate code
+/// Newtype pattern for `picnic_publickey_t`
+#[derive(Clone, Debug)]
+struct PublicKey(picnic_publickey_t);
 
-/// Returns a 0-initialized public key struct since it is not possible to implement the Default trait here.
-fn default_picnic_publickey_t() -> picnic_publickey_t {
-    picnic_publickey_t {
-        data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
+impl Default for PublicKey {
+    fn default() -> Self {
+        Self {
+            0: picnic_publickey_t {
+                data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
+            },
+        }
     }
 }
 
@@ -396,7 +401,7 @@ where
         let mut sk = SigningKey::new();
         let mut vk = VerificationKey::new();
 
-        match unsafe { picnic_keygen(P::PARAM, &mut vk.data, &mut sk.data.0) } {
+        match unsafe { picnic_keygen(P::PARAM, &mut vk.data.0, &mut sk.data.0) } {
             0 => Ok((sk, vk)),
             _ => Err(Error::new()),
         }
@@ -412,7 +417,7 @@ where
     fn verifier(&self) -> Result<Self::Verifier, Error> {
         let mut vk = VerificationKey::new();
 
-        match unsafe { picnic_sk_to_pk(&self.data.0, &mut vk.data) } {
+        match unsafe { picnic_sk_to_pk(&self.data.0, &mut vk.data.0) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
@@ -508,7 +513,7 @@ impl<P> Eq for SigningKey<P> where P: Parameters {}
 /// Verification key generic over the parameters
 #[derive(Clone)]
 pub struct VerificationKey<P: Parameters> {
-    data: picnic_publickey_t,
+    data: PublicKey,
     phantom_data: PhantomData<P>,
 }
 
@@ -518,7 +523,7 @@ where
 {
     fn new() -> Self {
         Self {
-            data: default_picnic_publickey_t(),
+            data: Default::default(),
             phantom_data: PhantomData,
         }
     }
@@ -531,7 +536,7 @@ where
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
         match unsafe {
             picnic_verify(
-                &self.data,
+                &self.data.0,
                 msg.as_ptr(),
                 msg.len(),
                 signature.0.as_ptr(),
@@ -559,7 +564,7 @@ where
 {
     fn as_ref(&self) -> &[u8] {
         // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_public_key
-        &self.data.data[0..P::PUBLIC_KEY_SIZE]
+        &self.data.0.data[0..P::PUBLIC_KEY_SIZE]
     }
 }
 
@@ -571,11 +576,11 @@ where
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut vk = Self::new();
-        if unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) } != 0 {
+        if unsafe { picnic_read_public_key(&mut vk.data.0, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
-        match unsafe { picnic_get_public_key_param(&vk.data) } == P::PARAM {
+        match unsafe { picnic_get_public_key_param(&vk.data.0) } == P::PARAM {
             true => Ok(vk),
             false => Err(Self::Error::new()),
         }
@@ -598,7 +603,7 @@ where
     P: Parameters,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.data.data[..P::PUBLIC_KEY_SIZE] == other.data.data[..P::PUBLIC_KEY_SIZE]
+        self.data.0.data[..P::PUBLIC_KEY_SIZE] == other.data.0.data[..P::PUBLIC_KEY_SIZE]
     }
 }
 
@@ -622,7 +627,7 @@ impl DynamicSigningKey {
         let mut sk = DynamicSigningKey::new();
         let mut vk = DynamicVerificationKey::new();
 
-        match unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data.0) } {
+        match unsafe { picnic_keygen(params, &mut vk.data.0, &mut sk.data.0) } {
             0 => Ok((sk, vk)),
             _ => Err(Error::new()),
         }
@@ -639,7 +644,7 @@ impl Signer<DynamicSignature> for DynamicSigningKey {
     fn verifier(&self) -> Result<Self::Verifier, Error> {
         let mut vk = DynamicVerificationKey::new();
 
-        match unsafe { picnic_sk_to_pk(&self.data.0, &mut vk.data) } {
+        match unsafe { picnic_sk_to_pk(&self.data.0, &mut vk.data.0) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
@@ -713,18 +718,18 @@ impl Eq for DynamicSigningKey {}
 /// Verification key
 #[derive(Clone, Debug)]
 pub struct DynamicVerificationKey {
-    data: picnic_publickey_t,
+    data: PublicKey,
 }
 
 impl DynamicVerificationKey {
     fn new() -> Self {
         Self {
-            data: default_picnic_publickey_t(),
+            data: Default::default(),
         }
     }
 
     fn param(&self) -> picnic_params_t {
-        unsafe { picnic_get_public_key_param(&self.data) }
+        unsafe { picnic_get_public_key_param(&self.data.0) }
     }
 }
 
@@ -732,7 +737,7 @@ impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
         match unsafe {
             picnic_verify(
-                &self.data,
+                &self.data.0,
                 msg.as_ptr(),
                 msg.len(),
                 signature.0.as_ptr(),
@@ -754,7 +759,7 @@ impl SerializedSize for DynamicVerificationKey {
 impl AsRef<[u8]> for DynamicVerificationKey {
     fn as_ref(&self) -> &[u8] {
         // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_public_key
-        &self.data.data[0..self.serialized_size()]
+        &self.data.0.data[0..self.serialized_size()]
     }
 }
 
@@ -763,7 +768,7 @@ impl TryFrom<&[u8]> for DynamicVerificationKey {
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut vk = Self::new();
-        if unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) } != 0 {
+        if unsafe { picnic_read_public_key(&mut vk.data.0, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
@@ -778,7 +783,7 @@ impl PartialEq for DynamicVerificationKey {
     fn eq(&self, other: &Self) -> bool {
         self.param() == other.param() && {
             let size = self.serialized_size();
-            self.data.data[..size] == other.data.data[..size]
+            self.data.0.data[..size] == other.data.0.data[..size]
         }
     }
 }
