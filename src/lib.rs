@@ -75,7 +75,9 @@ fn default_picnic_privatekey_t() -> picnic_privatekey_t {
     }
 }
 
+/// Helper trait to returns the serialized size keys
 trait SerializedSize {
+    /// Retrieve the size of the serialized object
     fn serialized_size(&self) -> usize;
 }
 
@@ -438,7 +440,7 @@ where
     P: Parameters,
 {
     fn as_ref(&self) -> &[u8] {
-        // FIXME: this breaks the abstraction layer
+        // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_private_key
         &self.data.data[0..P::PRIVATE_KEY_SIZE]
     }
 }
@@ -539,7 +541,7 @@ where
     P: Parameters,
 {
     fn as_ref(&self) -> &[u8] {
-        // FIXME: this breaks the abstraction layer
+        // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_public_key
         &self.data.data[0..P::PUBLIC_KEY_SIZE]
     }
 }
@@ -659,6 +661,7 @@ impl SerializedSize for DynamicSigningKey {
 
 impl AsRef<[u8]> for DynamicSigningKey {
     fn as_ref(&self) -> &[u8] {
+        // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_private_key
         &self.data.data[0..self.serialized_size()]
     }
 }
@@ -744,6 +747,7 @@ impl SerializedSize for DynamicVerificationKey {
 
 impl AsRef<[u8]> for DynamicVerificationKey {
     fn as_ref(&self) -> &[u8] {
+        // FIXME: this breaks the abstraction layer; this should be a call to picnic_write_public_key
         &self.data.data[0..self.serialized_size()]
     }
 }
