@@ -52,12 +52,12 @@
 #[cfg(all(not(feature = "picnic"), not(feature = "picnic3")))]
 compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
 
+use core::convert::TryFrom;
+use core::fmt::{Debug, Formatter};
+use core::marker::PhantomData;
 use picnic_sys::*;
 pub use signature::{self, Error};
-use std::convert::TryFrom;
 use std::ffi::CStr;
-use std::fmt::{Debug, Formatter};
-use std::marker::PhantomData;
 
 // Some helper functions to reduce boiler plate code
 
@@ -100,6 +100,18 @@ pub trait Parameters {
                 .into_owned()
         }
     }
+}
+
+/// Extension of the [signature::Signer] trait that allows to retrieve to corresponding verifier
+pub trait Signer<S>: signature::Signer<S>
+where
+    S: signature::Signature,
+{
+    /// The verifier type
+    type Verifier: signature::Verifier<S>;
+
+    /// Return corresponding verifier, i.e. verification key
+    fn verifier(&self) -> Result<Self::Verifier, Error>;
 }
 
 #[cfg(feature = "picnic")]
@@ -374,9 +386,15 @@ where
             _ => Err(Error::new()),
         }
     }
+}
 
-    /// Return corresponding verification key
-    pub fn verifying_key(&self) -> Result<VerificationKey<P>, Error> {
+impl<P> Signer<DynamicSignature> for SigningKey<P>
+where
+    P: Parameters,
+{
+    type Verifier = VerificationKey<P>;
+
+    fn verifier(&self) -> Result<Self::Verifier, Error> {
         let mut vk = VerificationKey::new();
 
         match unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) } {
@@ -606,18 +624,21 @@ impl DynamicSigningKey {
         }
     }
 
-    /// Return corresponding verification key
-    pub fn verifying_key(&self) -> Result<DynamicVerificationKey, Error> {
+    fn param(&self) -> picnic_params_t {
+        unsafe { picnic_get_private_key_param(&self.data) }
+    }
+}
+
+impl Signer<DynamicSignature> for DynamicSigningKey {
+    type Verifier = DynamicVerificationKey;
+
+    fn verifier(&self) -> Result<Self::Verifier, Error> {
         let mut vk = DynamicVerificationKey::new();
 
         match unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
-    }
-
-    fn param(&self) -> picnic_params_t {
-        unsafe { picnic_get_private_key_param(&self.data) }
     }
 }
 

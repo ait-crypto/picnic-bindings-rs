@@ -1,9 +1,9 @@
 #[generic_tests::define]
 mod tests {
     use picnic_bindings::{
-        signature::{Signer, Verifier},
-        DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, SigningKey,
-        VerificationKey,
+        signature::{Signer as BaseSigner, Verifier},
+        DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, Signer,
+        SigningKey, VerificationKey,
     };
     use std::convert::TryFrom;
 
@@ -33,13 +33,13 @@ mod tests {
     #[test]
     fn vk_match<P: Parameters>() {
         let (sk, vk) = SigningKey::<P>::random().unwrap();
-        assert_eq!(vk, sk.verifying_key().unwrap());
+        assert_eq!(vk, sk.verifier().unwrap());
     }
 
     #[test]
     fn dynamic_vk_match<P: Parameters>() {
         let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
-        assert_eq!(vk, sk.verifying_key().unwrap());
+        assert_eq!(vk, sk.verifier().unwrap());
     }
 
     #[test]
