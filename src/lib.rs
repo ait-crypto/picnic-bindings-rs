@@ -369,8 +369,7 @@ where
         let mut sk = SigningKey::new();
         let mut vk = VerificationKey::new();
 
-        let ret = unsafe { picnic_keygen(P::PARAM, &mut vk.data, &mut sk.data) };
-        match ret {
+        match unsafe { picnic_keygen(P::PARAM, &mut vk.data, &mut sk.data) } {
             0 => Ok((sk, vk)),
             _ => Err(Error::new()),
         }
@@ -380,8 +379,7 @@ where
     pub fn verifying_key(&self) -> Result<VerificationKey<P>, Error> {
         let mut vk = VerificationKey::new();
 
-        let ret = unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) };
-        match ret {
+        match unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
@@ -396,7 +394,7 @@ where
         let mut signature = vec![0; P::MAX_SIGNATURE_SIZE];
         let mut length = P::MAX_SIGNATURE_SIZE;
 
-        let ret = unsafe {
+        match unsafe {
             picnic_sign(
                 &self.data,
                 msg.as_ptr(),
@@ -404,8 +402,7 @@ where
                 signature.as_mut_ptr(),
                 &mut length,
             )
-        };
-        match ret {
+        } {
             0 => {
                 signature.resize(length, 0);
                 Ok(DynamicSignature { 0: signature })
@@ -453,8 +450,7 @@ where
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut sk = Self::new();
-        let ret = unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) };
-        if ret != 0 {
+        if unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
@@ -511,7 +507,7 @@ where
     P: Parameters,
 {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
-        let ret = unsafe {
+        match unsafe {
             picnic_verify(
                 &self.data,
                 msg.as_ptr(),
@@ -519,8 +515,7 @@ where
                 signature.0.as_ptr(),
                 signature.0.len(),
             )
-        };
-        match ret {
+        } {
             0 => Ok(()),
             _ => Err(Error::new()),
         }
@@ -554,8 +549,7 @@ where
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut vk = Self::new();
-        let ret = unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) };
-        if ret != 0 {
+        if unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
@@ -606,8 +600,7 @@ impl DynamicSigningKey {
         let mut sk = DynamicSigningKey::new();
         let mut vk = DynamicVerificationKey::new();
 
-        let ret = unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data) };
-        match ret {
+        match unsafe { picnic_keygen(params, &mut vk.data, &mut sk.data) } {
             0 => Ok((sk, vk)),
             _ => Err(Error::new()),
         }
@@ -617,8 +610,7 @@ impl DynamicSigningKey {
     pub fn verifying_key(&self) -> Result<DynamicVerificationKey, Error> {
         let mut vk = DynamicVerificationKey::new();
 
-        let ret = unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) };
-        match ret {
+        match unsafe { picnic_sk_to_pk(&self.data, &mut vk.data) } {
             0 => Ok(vk),
             _ => Err(Error::new()),
         }
@@ -634,7 +626,7 @@ impl signature::Signer<DynamicSignature> for DynamicSigningKey {
         let mut length = unsafe { picnic_signature_size(self.param()) };
         let mut signature = vec![0; length];
 
-        let ret = unsafe {
+        match unsafe {
             picnic_sign(
                 &self.data,
                 msg.as_ptr(),
@@ -642,8 +634,7 @@ impl signature::Signer<DynamicSignature> for DynamicSigningKey {
                 signature.as_mut_ptr(),
                 &mut length,
             )
-        };
-        match ret {
+        } {
             0 => {
                 signature.resize(length, 0);
                 Ok(DynamicSignature { 0: signature })
@@ -671,8 +662,7 @@ impl TryFrom<&[u8]> for DynamicSigningKey {
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut sk = Self::new();
-        let ret = unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) };
-        if ret != 0 {
+        if unsafe { picnic_read_private_key(&mut sk.data, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
@@ -723,7 +713,7 @@ impl DynamicVerificationKey {
 
 impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
-        let ret = unsafe {
+        match unsafe {
             picnic_verify(
                 &self.data,
                 msg.as_ptr(),
@@ -731,8 +721,7 @@ impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
                 signature.0.as_ptr(),
                 signature.0.len(),
             )
-        };
-        match ret {
+        } {
             0 => Ok(()),
             _ => Err(Error::new()),
         }
@@ -757,8 +746,7 @@ impl TryFrom<&[u8]> for DynamicVerificationKey {
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
         let mut vk = Self::new();
-        let ret = unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) };
-        if ret != 0 {
+        if unsafe { picnic_read_public_key(&mut vk.data, value.as_ptr(), value.len()) } != 0 {
             return Err(Self::Error::new());
         }
 
