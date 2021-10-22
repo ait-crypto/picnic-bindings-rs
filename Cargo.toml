@@ -7,6 +7,7 @@ homepage = "https://microsoft.github.io/Picnic/"
 repository = "https://github.com/ait-crypto/picnic-bindings-rs"
 license = "MIT"
 edition = "2018"
+rust-version = "1.47"
 keywords = ["signatures", "Picnic"]
 categories = ["cryptography", "api-bindings"]
 
