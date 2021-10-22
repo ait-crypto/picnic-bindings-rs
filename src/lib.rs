@@ -81,6 +81,18 @@ impl Drop for PrivateKey {
     }
 }
 
+impl TryFrom<&[u8]> for PrivateKey {
+    type Error = Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let mut sk = Self::default();
+        match unsafe { picnic_read_private_key(&mut sk.0, value.as_ptr(), value.len()) } {
+            0 => Ok(sk),
+            _ => Err(Self::Error::new()),
+        }
+    }
+}
+
 /// Newtype pattern for `picnic_publickey_t`
 #[derive(Clone, Debug)]
 struct PublicKey(picnic_publickey_t);
@@ -92,6 +104,34 @@ impl Default for PublicKey {
                 data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
             },
         }
+    }
+}
+
+impl TryFrom<&[u8]> for PublicKey {
+    type Error = Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let mut pk = Self::default();
+        match unsafe { picnic_read_public_key(&mut pk.0, value.as_ptr(), value.len()) } {
+            0 => Ok(pk),
+            _ => Err(Self::Error::new()),
+        }
+    }
+}
+
+trait PicnicKey {
+    fn param(&self) -> picnic_params_t;
+}
+
+impl PicnicKey for PrivateKey {
+    fn param(&self) -> picnic_params_t {
+        unsafe { picnic_get_private_key_param(&self.0) }
+    }
+}
+
+impl PicnicKey for PublicKey {
+    fn param(&self) -> picnic_params_t {
+        unsafe { picnic_get_public_key_param(&self.0) }
     }
 }
 
@@ -476,13 +516,12 @@ where
     type Error = Error;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut sk = Self::new();
-        if unsafe { picnic_read_private_key(&mut sk.data.0, value.as_ptr(), value.len()) } != 0 {
-            return Err(Self::Error::new());
-        }
-
-        match unsafe { picnic_get_private_key_param(&sk.data.0) } == P::PARAM {
-            true => Ok(sk),
+        let sk = PrivateKey::try_from(value)?;
+        match sk.param() == P::PARAM {
+            true => Ok(Self {
+                data: sk,
+                phantom_data: PhantomData,
+            }),
             false => Err(Self::Error::new()),
         }
     }
@@ -575,13 +614,12 @@ where
     type Error = Error;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut vk = Self::new();
-        if unsafe { picnic_read_public_key(&mut vk.data.0, value.as_ptr(), value.len()) } != 0 {
-            return Err(Self::Error::new());
-        }
-
-        match unsafe { picnic_get_public_key_param(&vk.data.0) } == P::PARAM {
-            true => Ok(vk),
+        let vk = PublicKey::try_from(value)?;
+        match vk.param() == P::PARAM {
+            true => Ok(Self {
+                data: vk,
+                phantom_data: PhantomData,
+            }),
             false => Err(Self::Error::new()),
         }
     }
@@ -634,7 +672,7 @@ impl DynamicSigningKey {
     }
 
     fn param(&self) -> picnic_params_t {
-        unsafe { picnic_get_private_key_param(&self.data.0) }
+        self.data.param()
     }
 }
 
@@ -691,13 +729,9 @@ impl TryFrom<&[u8]> for DynamicSigningKey {
     type Error = Error;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut sk = Self::new();
-        if unsafe { picnic_read_private_key(&mut sk.data.0, value.as_ptr(), value.len()) } != 0 {
-            return Err(Self::Error::new());
-        }
-
+        let sk = PrivateKey::try_from(value)?;
         match sk.param() != picnic_params_t::PARAMETER_SET_INVALID {
-            true => Ok(sk),
+            true => Ok(DynamicSigningKey { data: sk }),
             false => Err(Self::Error::new()),
         }
     }
@@ -705,9 +739,8 @@ impl TryFrom<&[u8]> for DynamicSigningKey {
 
 impl PartialEq for DynamicSigningKey {
     fn eq(&self, other: &Self) -> bool {
-        let self_param = self.param();
-        self_param == other.param() && {
-            let size = unsafe { picnic_get_private_key_size(self_param) };
+        self.param() == other.param() && {
+            let size = self.serialized_size();
             self.data.0.data[..size] == other.data.0.data[..size]
         }
     }
@@ -729,7 +762,7 @@ impl DynamicVerificationKey {
     }
 
     fn param(&self) -> picnic_params_t {
-        unsafe { picnic_get_public_key_param(&self.data.0) }
+        self.data.param()
     }
 }
 
@@ -767,13 +800,9 @@ impl TryFrom<&[u8]> for DynamicVerificationKey {
     type Error = Error;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut vk = Self::new();
-        if unsafe { picnic_read_public_key(&mut vk.data.0, value.as_ptr(), value.len()) } != 0 {
-            return Err(Self::Error::new());
-        }
-
+        let vk = PublicKey::try_from(value)?;
         match vk.param() != picnic_params_t::PARAMETER_SET_INVALID {
-            true => Ok(vk),
+            true => Ok(DynamicVerificationKey { data: vk }),
             false => Err(Self::Error::new()),
         }
     }
