@@ -62,12 +62,6 @@ use std::ffi::CStr;
 mod wrapper;
 use crate::wrapper::*;
 
-/// Helper trait to returns the serialized size keys
-trait SerializedSize {
-    /// Retrieve the size of the serialized object
-    fn serialized_size(&self) -> usize;
-}
-
 /// Trait to describe Picnic parameters
 pub trait Parameters {
     /// Internal parameter
@@ -356,22 +350,19 @@ impl<P> SigningKey<P>
 where
     P: Parameters,
 {
-    fn new() -> Self {
-        Self {
-            data: Default::default(),
-            phantom_data: PhantomData,
-        }
-    }
-
     /// Sample a new random signing key and the corresponding verification key
     pub fn random() -> Result<(Self, VerificationKey<P>), Error> {
-        let mut sk = SigningKey::new();
-        let mut vk = VerificationKey::new();
-
-        match unsafe { picnic_keygen(P::PARAM, vk.data.as_mut(), sk.data.as_mut()) } {
-            0 => Ok((sk, vk)),
-            _ => Err(Error::new()),
-        }
+        let (sk, vk) = PrivateKey::random(P::PARAM)?;
+        Ok((
+            Self {
+                data: sk,
+                phantom_data: PhantomData,
+            },
+            VerificationKey {
+                data: vk,
+                phantom_data: PhantomData,
+            },
+        ))
     }
 }
 
@@ -382,12 +373,11 @@ where
     type Verifier = VerificationKey<P>;
 
     fn verifier(&self) -> Result<Self::Verifier, Error> {
-        let mut vk = VerificationKey::new();
-
-        match unsafe { picnic_sk_to_pk(self.data.as_ref(), vk.data.as_mut()) } {
-            0 => Ok(vk),
-            _ => Err(Error::new()),
-        }
+        let vk = self.data.public_key()?;
+        Ok(Self::Verifier {
+            data: vk,
+            phantom_data: PhantomData,
+        })
     }
 }
 
@@ -397,30 +387,21 @@ where
 {
     fn try_sign(&self, msg: &[u8]) -> Result<DynamicSignature, Error> {
         let mut signature = vec![0; P::MAX_SIGNATURE_SIZE];
-        let mut length = P::MAX_SIGNATURE_SIZE;
 
-        match unsafe {
-            picnic_sign(
-                self.data.as_ref(),
-                msg.as_ptr(),
-                msg.len(),
-                signature.as_mut_ptr(),
-                &mut length,
-            )
-        } {
-            0 => {
-                signature.resize(length, 0);
-                Ok(DynamicSignature { 0: signature })
-            }
-            _ => Err(Error::new()),
-        }
+        let length = self.data.try_sign(msg, signature.as_mut_slice())?;
+        signature.resize(length, 0);
+        Ok(DynamicSignature { 0: signature })
     }
 }
 
-impl<P> SerializedSize for SigningKey<P>
+impl<P> PicnicKey for SigningKey<P>
 where
     P: Parameters,
 {
+    fn param(&self) -> picnic_params_t {
+        P::PARAM
+    }
+
     fn serialized_size(&self) -> usize {
         P::PRIVATE_KEY_SIZE
     }
@@ -484,42 +465,23 @@ pub struct VerificationKey<P: Parameters> {
     phantom_data: PhantomData<P>,
 }
 
-impl<P> VerificationKey<P>
-where
-    P: Parameters,
-{
-    fn new() -> Self {
-        Self {
-            data: Default::default(),
-            phantom_data: PhantomData,
-        }
-    }
-}
-
 impl<P> signature::Verifier<DynamicSignature> for VerificationKey<P>
 where
     P: Parameters,
 {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
-        match unsafe {
-            picnic_verify(
-                self.data.as_ref(),
-                msg.as_ptr(),
-                msg.len(),
-                signature.0.as_ptr(),
-                signature.0.len(),
-            )
-        } {
-            0 => Ok(()),
-            _ => Err(Error::new()),
-        }
+        self.data.verify(msg, &signature.0)
     }
 }
 
-impl<P> SerializedSize for VerificationKey<P>
+impl<P> PicnicKey for VerificationKey<P>
 where
     P: Parameters,
 {
+    fn param(&self) -> picnic_params_t {
+        P::PARAM
+    }
+
     fn serialized_size(&self) -> usize {
         P::PUBLIC_KEY_SIZE
     }
@@ -583,25 +545,10 @@ pub struct DynamicSigningKey {
 }
 
 impl DynamicSigningKey {
-    fn new() -> Self {
-        Self {
-            data: Default::default(),
-        }
-    }
-
     /// Sample a new random signing key and the corresponding verification key
     pub fn random(params: picnic_params_t) -> Result<(Self, DynamicVerificationKey), Error> {
-        let mut sk = DynamicSigningKey::new();
-        let mut vk = DynamicVerificationKey::new();
-
-        match unsafe { picnic_keygen(params, vk.data.as_mut(), sk.data.as_mut()) } {
-            0 => Ok((sk, vk)),
-            _ => Err(Error::new()),
-        }
-    }
-
-    fn param(&self) -> picnic_params_t {
-        self.data.param()
+        let (sk, vk) = PrivateKey::random(params)?;
+        Ok((Self { data: sk }, DynamicVerificationKey { data: vk }))
     }
 }
 
@@ -609,41 +556,29 @@ impl Signer<DynamicSignature> for DynamicSigningKey {
     type Verifier = DynamicVerificationKey;
 
     fn verifier(&self) -> Result<Self::Verifier, Error> {
-        let mut vk = DynamicVerificationKey::new();
-
-        match unsafe { picnic_sk_to_pk(self.data.as_ref(), vk.data.as_mut()) } {
-            0 => Ok(vk),
-            _ => Err(Error::new()),
-        }
+        let vk = self.data.public_key()?;
+        Ok(Self::Verifier { data: vk })
     }
 }
 
 impl signature::Signer<DynamicSignature> for DynamicSigningKey {
     fn try_sign(&self, msg: &[u8]) -> Result<DynamicSignature, Error> {
-        let mut length = unsafe { picnic_signature_size(self.param()) };
+        let length = unsafe { picnic_signature_size(self.param()) };
         let mut signature = vec![0; length];
 
-        match unsafe {
-            picnic_sign(
-                self.data.as_ref(),
-                msg.as_ptr(),
-                msg.len(),
-                signature.as_mut_ptr(),
-                &mut length,
-            )
-        } {
-            0 => {
-                signature.resize(length, 0);
-                Ok(DynamicSignature { 0: signature })
-            }
-            _ => Err(Error::new()),
-        }
+        let length = self.data.try_sign(msg, signature.as_mut_slice())?;
+        signature.resize(length, 0);
+        Ok(DynamicSignature { 0: signature })
     }
 }
 
-impl SerializedSize for DynamicSigningKey {
+impl PicnicKey for DynamicSigningKey {
+    fn param(&self) -> picnic_params_t {
+        self.data.param()
+    }
+
     fn serialized_size(&self) -> usize {
-        unsafe { picnic_get_private_key_size(self.param()) }
+        self.data.serialized_size()
     }
 }
 
@@ -683,38 +618,19 @@ pub struct DynamicVerificationKey {
     data: PublicKey,
 }
 
-impl DynamicVerificationKey {
-    fn new() -> Self {
-        Self {
-            data: Default::default(),
-        }
+impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
+    fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
+        self.data.verify(msg, &signature.0)
     }
+}
 
+impl PicnicKey for DynamicVerificationKey {
     fn param(&self) -> picnic_params_t {
         self.data.param()
     }
-}
 
-impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
-    fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
-        match unsafe {
-            picnic_verify(
-                self.data.as_ref(),
-                msg.as_ptr(),
-                msg.len(),
-                signature.0.as_ptr(),
-                signature.0.len(),
-            )
-        } {
-            0 => Ok(()),
-            _ => Err(Error::new()),
-        }
-    }
-}
-
-impl SerializedSize for DynamicVerificationKey {
     fn serialized_size(&self) -> usize {
-        unsafe { picnic_get_public_key_size(self.param()) }
+        self.data.serialized_size()
     }
 }
 
