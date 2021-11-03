@@ -47,6 +47,7 @@
 //! ```
 
 #![warn(missing_docs)]
+#![warn(rust_2018_idioms)]
 
 // If neither is specified, the crate is essentially empty.
 #[cfg(all(not(feature = "picnic"), not(feature = "picnic3")))]
