@@ -1,6 +1,19 @@
 use core::convert::TryFrom;
 use picnic_sys::*;
 use signature::Error;
+use std::ffi::CStr;
+
+/// Obtain the "name" of a parameter set `param`
+pub(crate) fn parameter_name(param: picnic_params_t) -> &'static str {
+    // The string returned by `picnic_get_param_name` is always valid UTF-8 and has static lifetime.
+    let name = unsafe { CStr::from_ptr(picnic_get_param_name(param)) };
+    name.to_str().unwrap()
+}
+
+/// Obtain max signature size for a parameter set `param`
+pub(crate) fn signature_size(param: picnic_params_t) -> usize {
+    unsafe { picnic_signature_size(param) }
+}
 
 /// Common properties of a Picnic key
 pub(crate) trait PicnicKey {
@@ -165,5 +178,31 @@ impl PicnicKey for PublicKey {
 
     fn serialized_size(&self) -> usize {
         unsafe { picnic_get_public_key_size(self.param()) }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::parameter_name;
+    use picnic_sys::*;
+
+    #[cfg(feature = "picnic")]
+    #[test]
+    fn parameter_name_matches() {
+        assert_eq!(
+            parameter_name(picnic_params_t::Picnic_L1_FS),
+            "Picnic_L1_FS"
+        );
+    }
+
+    #[test]
+    fn parameter_name_invalid() {
+        assert_ne!(parameter_name(picnic_params_t::PARAMETER_SET_INVALID), "");
+    }
+
+    #[cfg(feature = "picnic")]
+    #[test]
+    fn signature_size_non_zero() {
+        assert!(super::signature_size(picnic_params_t::Picnic_L1_FS) > 0);
     }
 }

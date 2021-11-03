@@ -57,7 +57,6 @@ use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 use picnic_sys::*;
 pub use signature::{self, Error};
-use std::ffi::CStr;
 
 mod wrapper;
 use crate::wrapper::*;
@@ -75,11 +74,7 @@ pub trait Parameters {
 
     /// Retrieve name of the parameter set
     fn parameter_name() -> String {
-        unsafe {
-            CStr::from_ptr(picnic_get_param_name(Self::PARAM))
-                .to_string_lossy()
-                .into_owned()
-        }
+        wrapper::parameter_name(Self::PARAM).into()
     }
 }
 
@@ -563,9 +558,7 @@ impl Signer<DynamicSignature> for DynamicSigningKey {
 
 impl signature::Signer<DynamicSignature> for DynamicSigningKey {
     fn try_sign(&self, msg: &[u8]) -> Result<DynamicSignature, Error> {
-        let length = unsafe { picnic_signature_size(self.param()) };
-        let mut signature = vec![0; length];
-
+        let mut signature = vec![0; signature_size(self.param())];
         let length = self.data.try_sign(msg, signature.as_mut_slice())?;
         signature.resize(length, 0);
         Ok(DynamicSignature { 0: signature })
