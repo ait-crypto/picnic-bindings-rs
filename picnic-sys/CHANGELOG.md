@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.5 (2021-11-05)
+
+* Add new constants from Picnic 3.0.5
+
 ## 3.0.4 (2021-10-21)
 
 * Make crate self-contained by including Picnic's 3.0.5 source
