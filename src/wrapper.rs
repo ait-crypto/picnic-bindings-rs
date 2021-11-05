@@ -185,26 +185,47 @@ impl PicnicKey for PublicKey {
 
 #[cfg(test)]
 mod test {
-    use super::parameter_name;
-    use picnic_sys::*;
-
-    #[cfg(feature = "picnic")]
-    #[test]
-    fn parameter_name_matches() {
-        assert_eq!(
-            parameter_name(picnic_params_t::Picnic_L1_FS),
-            "Picnic_L1_FS"
-        );
-    }
+    use super::*;
 
     #[test]
     fn parameter_name_invalid() {
         assert_ne!(parameter_name(picnic_params_t::PARAMETER_SET_INVALID), "");
     }
 
-    #[cfg(feature = "picnic")]
     #[test]
-    fn signature_size_non_zero() {
-        assert!(super::signature_size(picnic_params_t::Picnic_L1_FS) > 0);
+    fn keygen_invalid() {
+        assert!(PrivateKey::random(picnic_params_t::PARAMETER_SET_INVALID).is_err());
+    }
+
+    #[cfg(feature = "picnic")]
+    mod picnic {
+        use super::super::*;
+
+        #[test]
+        fn signature_size_non_zero() {
+            assert!(signature_size(picnic_params_t::Picnic_L1_FS) > 0);
+        }
+
+        #[test]
+        fn parameter_name_matches() {
+            assert_eq!(
+                parameter_name(picnic_params_t::Picnic_L1_FS),
+                "Picnic_L1_FS"
+            );
+        }
+
+        #[test]
+        fn keygen() {
+            assert!(PrivateKey::random(picnic_params_t::Picnic_L1_FS).is_ok());
+        }
+
+        #[test]
+        fn sign_and_verify() {
+            let (sk, pk) = PrivateKey::random(picnic_params_t::Picnic_L1_FS).unwrap();
+            let msg = "test message".as_bytes();
+            let mut signature = [0u8; PICNIC_SIGNATURE_SIZE_Picnic_L1_FS];
+            let length = sk.try_sign(msg, &mut signature).unwrap();
+            assert!(pk.verify(msg, &signature[0..length]).is_ok());
+        }
     }
 }
