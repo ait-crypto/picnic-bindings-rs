@@ -56,6 +56,7 @@ compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
 use core::convert::TryFrom;
 use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
+use paste::paste;
 use picnic_sys::*;
 pub use signature::{self, Error};
 
@@ -91,224 +92,67 @@ where
     fn verifier(&self) -> Result<Self::Verifier, Error>;
 }
 
-#[cfg(feature = "picnic")]
-/// Picnic-L1-FS parameters
-pub struct PicnicL1FS {}
+/// Define a parameters set and its associated implementations and types
+// $realparam should be replaced by [<picnic_params_t:: $param>] but that does not compile.
+macro_rules! define_params {
+    ($name:ident, $param:ident, $realparam:expr) => {
+        paste! {
+            #[doc = $name " parameters"]
+            pub struct $name {}
 
-#[cfg(feature = "picnic")]
-impl Parameters for PicnicL1FS {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L1_FS;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L1_FS;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_FS;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_FS;
-}
+            impl Parameters for $name {
+                const PARAM: picnic_params_t = $realparam;
+                const MAX_SIGNATURE_SIZE: usize = [<PICNIC_SIGNATURE_SIZE_ $param>];
+                const PRIVATE_KEY_SIZE: usize = [<PICNIC_PRIVATE_KEY_SIZE_ $param>];
+                const PUBLIC_KEY_SIZE: usize = [<PICNIC_PUBLIC_KEY_SIZE_ $param>];
+            }
 
-#[cfg(feature = "unruh-transform")]
-/// Picnic-L1-UR parameters
-pub struct PicnicL1UR {}
-
-#[cfg(feature = "unruh-transform")]
-impl Parameters for PicnicL1UR {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L1_UR;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L1_UR;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_UR;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_UR;
-}
-
-#[cfg(feature = "picnic")]
-/// Picnic-L1-full parameters
-pub struct PicnicL1Full {}
-
-#[cfg(feature = "picnic")]
-impl Parameters for PicnicL1Full {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L1_full;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L1_full;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L1_full;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L1_full;
+            #[doc = "Signing key for " $name]
+            pub type [<$name SigningKey>] = SigningKey<$name>;
+            #[doc = "Verification key for " $name]
+            pub type [<$name VerificationKey>] = VerificationKey<$name>;
+        }
+    };
 }
 
 #[cfg(feature = "picnic")]
-/// Picnic-L3-FS parameters
-pub struct PicnicL3FS {}
-
+define_params!(PicnicL1FS, Picnic_L1_FS, picnic_params_t::Picnic_L1_FS);
+#[cfg(feature = "unruh-picnic")]
+define_params!(PicnicL1UR, Picnic_L1_UR, picnic_params_t::Picnic_L1_UR);
 #[cfg(feature = "picnic")]
-impl Parameters for PicnicL3FS {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L3_FS;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L3_FS;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_FS;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_FS;
-}
-
-#[cfg(feature = "unruh-transform")]
-/// Picnic-L3-UR parameters
-pub struct PicnicL3UR {}
-
-#[cfg(feature = "unruh-transform")]
-impl Parameters for PicnicL3UR {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L3_UR;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L3_UR;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_UR;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_UR;
-}
-
-#[cfg(feature = "picnic")]
-/// Picnic-L3-full parameters
-pub struct PicnicL3Full {}
-
-#[cfg(feature = "picnic")]
-impl Parameters for PicnicL3Full {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L3_full;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L3_full;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L3_full;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L3_full;
-}
-
-#[cfg(feature = "picnic")]
-/// Picnic-L5-FS parameters
-pub struct PicnicL5FS {}
-
-#[cfg(feature = "picnic")]
-impl Parameters for PicnicL5FS {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L5_FS;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L5_FS;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_FS;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_FS;
-}
-
-#[cfg(feature = "unruh-transform")]
-/// Picnic-L5-UR parameters
-pub struct PicnicL5UR {}
-
-#[cfg(feature = "unruh-transform")]
-impl Parameters for PicnicL5UR {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L5_UR;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L5_UR;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_UR;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_UR;
-}
-
-#[cfg(feature = "picnic")]
-/// Picnic-L5-full parameters
-pub struct PicnicL5Full {}
-
-#[cfg(feature = "picnic")]
-impl Parameters for PicnicL5Full {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic_L5_full;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic_L5_full;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic_L5_full;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic_L5_full;
-}
-
+define_params!(
+    PicnicL1Full,
+    Picnic_L1_full,
+    picnic_params_t::Picnic_L1_full
+);
 #[cfg(feature = "picnic3")]
-/// Picnic3-L1 parameters
-pub struct Picnic3L1 {}
-
-#[cfg(feature = "picnic3")]
-impl Parameters for Picnic3L1 {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic3_L1;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic3_L1;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic3_L1;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic3_L1;
-}
-
-#[cfg(feature = "picnic3")]
-/// Picnic3-L3 parameter
-pub struct Picnic3L3 {}
-
-#[cfg(feature = "picnic3")]
-impl Parameters for Picnic3L3 {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic3_L3;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic3_L3;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic3_L3;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic3_L3;
-}
-
-#[cfg(feature = "picnic3")]
-/// Picnic3-L5 parameters
-pub struct Picnic3L5 {}
-
-#[cfg(feature = "picnic3")]
-impl Parameters for Picnic3L5 {
-    const PARAM: picnic_params_t = picnic_params_t::Picnic3_L5;
-    const MAX_SIGNATURE_SIZE: usize = PICNIC_SIGNATURE_SIZE_Picnic3_L5;
-    const PRIVATE_KEY_SIZE: usize = PICNIC_PRIVATE_KEY_SIZE_Picnic3_L5;
-    const PUBLIC_KEY_SIZE: usize = PICNIC_PUBLIC_KEY_SIZE_Picnic3_L5;
-}
+define_params!(Picnic3L1, Picnic3_L1, picnic_params_t::Picnic3_L1);
 
 #[cfg(feature = "picnic")]
-/// Signing key for Picnic-L1-FS
-pub type PicnicL1FSSigningKey = SigningKey<PicnicL1FS>;
+define_params!(PicnicL3FS, Picnic_L3_FS, picnic_params_t::Picnic_L3_FS);
+#[cfg(feature = "unruh-picnic")]
+define_params!(PicnicL3UR, Picnic_L3_UR, picnic_params_t::Picnic_L3_UR);
 #[cfg(feature = "picnic")]
-/// Verification key for Picnic-L1-FS
-pub type PicnicL1FSVerificationKey = VerificationKey<PicnicL1FS>;
-#[cfg(feature = "unruh-transform")]
-/// Signing key for Picnic-L1-UR
-pub type PicnicL1URSigningKey = SigningKey<PicnicL1UR>;
-#[cfg(feature = "unruh-transform")]
-/// Verification key for Picnic-L1-UR
-pub type PicnicL1URVerificationKey = VerificationKey<PicnicL1UR>;
-#[cfg(feature = "picnic")]
-/// Signing key for Picnic-L1-full
-pub type PicnicL1FullSigningKey = SigningKey<PicnicL1Full>;
-#[cfg(feature = "picnic")]
-/// Verification key for Picnic-L1-full
-pub type PicnicL1FullVerificationKey = VerificationKey<PicnicL1Full>;
+define_params!(
+    PicnicL3Full,
+    Picnic_L3_full,
+    picnic_params_t::Picnic_L3_full
+);
 #[cfg(feature = "picnic3")]
-/// Signing key for Picnic3-L1
-pub type Picnic3L1SigningKey = SigningKey<Picnic3L1>;
-#[cfg(feature = "picnic3")]
-/// Verification key for Picnic3-L1
-pub type Picnic3L1VerificationKey = VerificationKey<Picnic3L1>;
+define_params!(Picnic3L3, Picnic3_L3, picnic_params_t::Picnic3_L3);
 
 #[cfg(feature = "picnic")]
-/// Signing key for Picnic-L3-FS
-pub type PicnicL3FSSigningKey = SigningKey<PicnicL3FS>;
+define_params!(PicnicL5FS, Picnic_L5_FS, picnic_params_t::Picnic_L5_FS);
+#[cfg(feature = "unruh-picnic")]
+define_params!(PicnicL5UR, Picnic_L5_UR, picnic_params_t::Picnic_L5_UR);
 #[cfg(feature = "picnic")]
-/// Verification key for Picnic-L3-FS
-pub type PicnicL3FSVerificationKey = VerificationKey<PicnicL3FS>;
-#[cfg(feature = "unruh-transform")]
-/// Signing key for Picnic-L3-UR
-pub type PicnicL3URSigningKey = SigningKey<PicnicL3UR>;
-#[cfg(feature = "unruh-transform")]
-/// Verification key for Picnic-L3-UR
-pub type PicnicL3URVerificationKey = VerificationKey<PicnicL3UR>;
-#[cfg(feature = "picnic")]
-/// Signing key for Picnic-L3-full
-pub type PicnicL3FullSigningKey = SigningKey<PicnicL3Full>;
-#[cfg(feature = "picnic")]
-/// Verification key for Picnic-L3-full
-pub type PicnicL3FullVerificationKey = VerificationKey<PicnicL3Full>;
+define_params!(
+    PicnicL5Full,
+    Picnic_L5_full,
+    picnic_params_t::Picnic_L5_full
+);
 #[cfg(feature = "picnic3")]
-/// Signing key for Picnic3-L3
-pub type Picnic3L3SigningKey = SigningKey<Picnic3L3>;
-#[cfg(feature = "picnic3")]
-/// Verification key for Picnic3-L3
-pub type Picnic3L3VerificationKey = VerificationKey<Picnic3L3>;
-
-#[cfg(feature = "picnic")]
-/// Signing key for Picnic-L5-FS
-pub type PicnicL5FSSigningKey = SigningKey<PicnicL5FS>;
-#[cfg(feature = "picnic")]
-/// Verification key for Picnic-L5-FS
-pub type PicnicL5FSVerificationKey = VerificationKey<PicnicL5FS>;
-#[cfg(feature = "unruh-transform")]
-/// Signing key for Picnic-L5-UR
-pub type PicnicL5URSigningKey = SigningKey<PicnicL5UR>;
-#[cfg(feature = "unruh-transform")]
-/// Verification key for Picnic-L5-UR
-pub type PicnicL5URVerificationKey = VerificationKey<PicnicL5UR>;
-#[cfg(feature = "picnic")]
-/// Signing key for Picnic-L5-full
-pub type PicnicL5FullSigningKey = SigningKey<PicnicL5Full>;
-#[cfg(feature = "picnic")]
-/// Verification key for Picnic-L5-full
-pub type PicnicL5FullVerificationKey = VerificationKey<PicnicL5Full>;
-#[cfg(feature = "picnic3")]
-/// Signing key for Picnic3-L5
-pub type Picnic3L5SigningKey = SigningKey<Picnic3L5>;
-#[cfg(feature = "picnic3")]
-/// Verification key for Picnic3-L5
-pub type Picnic3L5VerificationKey = VerificationKey<Picnic3L5>;
+define_params!(Picnic3L5, Picnic3_L5, picnic_params_t::Picnic3_L5);
 
 /// Signature stored in a `Vec`
 ///
