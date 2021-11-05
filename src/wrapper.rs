@@ -1,6 +1,5 @@
 /// This module provides a very thin wrapper and contains all the unsafe calls to the picnic
 /// implementation.
-use core::convert::TryFrom;
 use picnic_sys::*;
 use signature::Error;
 use std::ffi::CStr;

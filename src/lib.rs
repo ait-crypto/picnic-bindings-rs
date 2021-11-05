@@ -47,13 +47,11 @@
 //! ```
 
 #![warn(missing_docs)]
-#![warn(rust_2018_idioms)]
 
 // If neither is specified, the crate is essentially empty.
 #[cfg(all(not(feature = "picnic"), not(feature = "picnic3")))]
 compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
 
-use core::convert::TryFrom;
 use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 use paste::paste;
@@ -506,8 +504,6 @@ impl Eq for DynamicVerificationKey {}
 mod test {
     #[cfg(feature = "picnic")]
     use crate::{PicnicL1FSSigningKey, PicnicL1FullSigningKey, PicnicL1FullVerificationKey};
-    #[cfg(feature = "picnic")]
-    use std::convert::TryFrom;
 
     #[cfg(feature = "picnic")]
     #[test]

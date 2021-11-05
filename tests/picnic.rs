@@ -5,7 +5,6 @@ mod tests {
         DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, Signer,
         SigningKey, VerificationKey,
     };
-    use std::convert::TryFrom;
 
     const TEST_MESSAGE: &[u8] = "test message".as_bytes();
 
