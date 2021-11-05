@@ -117,7 +117,7 @@ macro_rules! define_params {
 
 #[cfg(feature = "picnic")]
 define_params!(PicnicL1FS, Picnic_L1_FS, picnic_params_t::Picnic_L1_FS);
-#[cfg(feature = "unruh-picnic")]
+#[cfg(feature = "unruh-transform")]
 define_params!(PicnicL1UR, Picnic_L1_UR, picnic_params_t::Picnic_L1_UR);
 #[cfg(feature = "picnic")]
 define_params!(
@@ -130,7 +130,7 @@ define_params!(Picnic3L1, Picnic3_L1, picnic_params_t::Picnic3_L1);
 
 #[cfg(feature = "picnic")]
 define_params!(PicnicL3FS, Picnic_L3_FS, picnic_params_t::Picnic_L3_FS);
-#[cfg(feature = "unruh-picnic")]
+#[cfg(feature = "unruh-transform")]
 define_params!(PicnicL3UR, Picnic_L3_UR, picnic_params_t::Picnic_L3_UR);
 #[cfg(feature = "picnic")]
 define_params!(
@@ -143,7 +143,7 @@ define_params!(Picnic3L3, Picnic3_L3, picnic_params_t::Picnic3_L3);
 
 #[cfg(feature = "picnic")]
 define_params!(PicnicL5FS, Picnic_L5_FS, picnic_params_t::Picnic_L5_FS);
-#[cfg(feature = "unruh-picnic")]
+#[cfg(feature = "unruh-transform")]
 define_params!(PicnicL5UR, Picnic_L5_UR, picnic_params_t::Picnic_L5_UR);
 #[cfg(feature = "picnic")]
 define_params!(
