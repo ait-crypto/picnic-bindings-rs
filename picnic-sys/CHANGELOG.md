@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.6 (2021-11-09)
+
+* Do not set `no_std` if building tests.
+
 ## 3.0.5 (2021-11-05)
 
 * Add new constants from Picnic 3.0.5
