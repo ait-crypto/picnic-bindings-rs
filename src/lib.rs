@@ -296,6 +296,20 @@ where
 
 impl<P> Eq for SigningKey<P> where P: Parameters {}
 
+#[cfg(feature = "subtle")]
+use subtle::{Choice, ConstantTimeEq};
+
+#[cfg(feature = "subtle")]
+impl<P> ConstantTimeEq for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn ct_eq(&self, other: &Self) -> Choice {
+        self.data.as_ref().data[..P::PRIVATE_KEY_SIZE]
+            .ct_eq(&other.data.as_ref().data[..P::PRIVATE_KEY_SIZE])
+    }
+}
+
 /// Verification key generic over the parameters
 #[derive(Clone)]
 pub struct VerificationKey<P: Parameters> {

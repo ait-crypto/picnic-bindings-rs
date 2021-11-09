@@ -106,6 +106,18 @@ mod tests {
         vk2.verify(TEST_MESSAGE, &signature1).unwrap();
     }
 
+    #[cfg(feature = "subtle")]
+    #[test]
+    fn subtle_eq<P: Parameters>() {
+        use subtle::ConstantTimeEq;
+
+        let (sk1, _vk1) = SigningKey::<P>::random().unwrap();
+        let (sk2, _vk2) = SigningKey::<P>::random().unwrap();
+
+        assert!(bool::from(sk1.ct_eq(&sk1)));
+        assert!(!bool::from(sk1.ct_eq(&sk2)));
+    }
+
     #[cfg(feature = "picnic")]
     #[instantiate_tests(<PicnicL1FS>)]
     mod picnic_l1_fs {}

@@ -10,6 +10,7 @@ This crate supports the following features:
 * `picnic3` (default): Enable the Picnic parameter sets with KKW/Fiat-Shamir as proof system.
 * `system` (default): Use the shared library of Picnic per default.
 * `static-fallback` (default): Build Picnic on demand if shared library is not available.
+* `subtle`: Provide constant-time equality comparison for `SigningKey`.
 
 ## Security Notes
 
