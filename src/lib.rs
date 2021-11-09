@@ -278,7 +278,7 @@ where
     P: Parameters,
 {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
-        fmt.debug_struct(format!("SigningKey<{}>", P::parameter_name()).as_str())
+        fmt.debug_struct(&format!("SigningKey<{}>", P::parameter_name()))
             .field("data", &self.data)
             .finish()
     }
@@ -358,7 +358,7 @@ where
     P: Parameters,
 {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
-        fmt.debug_struct(format!("VerificationKey<{}>", P::parameter_name()).as_str())
+        fmt.debug_struct(&format!("VerificationKey<{}>", P::parameter_name()))
             .field("data", &self.data)
             .finish()
     }
