@@ -5,7 +5,7 @@
 //! More information on Picnic is available on the project website:
 //! <https://microsoft.github.io/Picnic/>
 
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 #![allow(non_upper_case_globals, non_camel_case_types)]
 
 pub use libc::{c_char, c_int, size_t};
