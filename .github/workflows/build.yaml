@@ -22,6 +22,7 @@ jobs:
           profile: minimal
           toolchain: ${{matrix.toolchain}}
           override: true
+      - uses: Swatinem/rust-cache@v1
       - name: Install dependencies
         run: |
           sudo add-apt-repository -u -y ppa:s-ramacher/picnic
@@ -58,6 +59,7 @@ jobs:
           profile: minimal
           toolchain: ${{matrix.toolchain}}
           override: true
+      - uses: Swatinem/rust-cache@v1
       - name: Test with default features
         uses: actions-rs/cargo@v1
         with:
@@ -78,6 +80,7 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt
+      - uses: Swatinem/rust-cache@v1
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -93,6 +96,7 @@ jobs:
           toolchain: stable
           override: true
           components: clippy
+      - uses: Swatinem/rust-cache@v1
       - name: Install dependencies
         run: |
           sudo add-apt-repository -u -y ppa:s-ramacher/picnic
