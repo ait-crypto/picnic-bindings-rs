@@ -36,7 +36,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --workspace
+          args: --all-features
 
   test-static:
     runs-on: ${{ matrix.os }}
@@ -70,7 +70,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --workspace
+          args: --all-features
 
   fmt:
     name: Rustfmt
