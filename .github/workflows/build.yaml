@@ -31,11 +31,12 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
+          args: --workspace
       - name: Test with all features
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features
+          args: --all-features --workspace
 
   test-static:
     runs-on: ${{ matrix.os }}
@@ -64,11 +65,12 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
+          args: --workspace
       - name: Test with all features
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features
+          args: --all-features --workspace
 
   fmt:
     name: Rustfmt
