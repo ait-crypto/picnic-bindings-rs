@@ -46,20 +46,26 @@
 //! # }
 //! ```
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![warn(missing_docs)]
 
 // If neither is specified, the crate is essentially empty.
 #[cfg(all(not(feature = "picnic"), not(feature = "picnic3")))]
 compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
 
+#[cfg(not(feature = "std"))]
 extern crate alloc;
 
-#[cfg(feature = "std")]
-extern crate std;
+#[cfg(not(feature = "std"))]
+use alloc::{
+    fmt::{self, Debug},
+    format, vec,
+    vec::Vec,
+};
 
-use alloc::{fmt, format, vec, vec::Vec};
-use core::fmt::Debug;
+#[cfg(feature = "std")]
+use std::fmt::{self, Debug};
+
 use core::marker::PhantomData;
 use paste::paste;
 use picnic_sys::*;
