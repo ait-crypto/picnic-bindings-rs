@@ -12,6 +12,7 @@ This crate supports the following features:
 * `static-fallback` (default): Build Picnic on demand if shared library is not available.
 * `std` (default): Use `std`.
 * `subtle`: Provide constant-time equality comparison for `SigningKey`.
+* `serialization`: Enable serialization with [serde](https://serde.rs).
 
 If the crate is not built with `std` enabled, the `alloc` crates is used.
 

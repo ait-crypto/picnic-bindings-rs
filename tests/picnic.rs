@@ -118,6 +118,152 @@ mod tests {
         assert!(!bool::from(sk1.ct_eq(&sk2)));
     }
 
+    #[cfg(all(feature = "serialization", feature = "std"))]
+    mod serialization_helpers {
+        use super::*;
+        use serde::{de, ser::SerializeStruct, Deserializer, Serializer};
+        pub(crate) use serde::{Deserialize, Serialize};
+        use std::fmt;
+        use std::marker::PhantomData;
+
+        #[derive(Debug, Eq, PartialEq)]
+        pub(crate) struct KeyPair<P: Parameters> {
+            pub(crate) sk: SigningKey<P>,
+            pub(crate) vk: VerificationKey<P>,
+        }
+
+        impl<P> Serialize for KeyPair<P>
+        where
+            P: Parameters,
+        {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: Serializer,
+            {
+                let mut serializer = serializer.serialize_struct("KeyPair", 2)?;
+                serializer.serialize_field("sk", &self.sk)?;
+                serializer.serialize_field("vk", &self.vk)?;
+                serializer.end()
+            }
+        }
+
+        impl<'de, P> Deserialize<'de> for KeyPair<P>
+        where
+            P: Parameters,
+        {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                struct KeyPairVisitor<Q>(PhantomData<Q>);
+
+                impl<'de, Q> de::Visitor<'de> for KeyPairVisitor<Q>
+                where
+                    Q: Parameters,
+                {
+                    type Value = KeyPair<Q>;
+
+                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                        formatter.write_str("struct KeyPair")
+                    }
+
+                    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+                    where
+                        A: de::SeqAccess<'de>,
+                    {
+                        let sk = seq
+                            .next_element()?
+                            .ok_or_else(|| de::Error::invalid_length(0, &self))?;
+                        let vk = seq
+                            .next_element()?
+                            .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                        Ok(KeyPair { sk, vk })
+                    }
+
+                    fn visit_map<V>(self, mut map: V) -> Result<Self::Value, V::Error>
+                    where
+                        V: de::MapAccess<'de>,
+                    {
+                        let mut sk = None;
+                        let mut vk = None;
+                        while let Some(key) = map.next_key()? {
+                            if key == "sk" {
+                                if sk.is_some() {
+                                    return Err(de::Error::duplicate_field("sk"));
+                                }
+                                sk = Some(map.next_value()?);
+                            } else if key == "vk" {
+                                if vk.is_some() {
+                                    return Err(de::Error::duplicate_field("vk"));
+                                }
+                                vk = Some(map.next_value()?);
+                            } else {
+                                return Err(de::Error::unknown_field(key, &["sk", "vk"]));
+                            }
+                        }
+                        let sk = sk.ok_or_else(|| de::Error::missing_field("sk"))?;
+                        let vk = vk.ok_or_else(|| de::Error::missing_field("vk"))?;
+                        Ok(KeyPair { sk, vk })
+                    }
+                }
+
+                deserializer.deserialize_struct(
+                    "KeyPair",
+                    &["sk", "vk"],
+                    KeyPairVisitor::<P>(PhantomData),
+                )
+            }
+        }
+
+        #[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
+        pub(crate) struct DynamicKeyPair {
+            pub(crate) sk: DynamicSigningKey,
+            pub(crate) vk: DynamicVerificationKey,
+        }
+    }
+
+    #[cfg(all(feature = "serialization", feature = "std"))]
+    use serialization_helpers::{Deserialize, DynamicKeyPair, KeyPair, Serialize};
+
+    #[cfg(all(feature = "serialization", feature = "std"))]
+    #[test]
+    fn serde_serialization<P: Parameters>() {
+        let mut out = vec![];
+        let mut ser = serde_json::Serializer::new(&mut out);
+        let ser = serde_bytes_repr::ByteFmtSerializer::hex(&mut ser);
+
+        let (sk1, vk1) = SigningKey::<P>::random().unwrap();
+        let kp1 = KeyPair { sk: sk1, vk: vk1 };
+        kp1.serialize(ser).unwrap();
+        let serialized = String::from_utf8(out).unwrap();
+
+        let mut json_de = serde_json::Deserializer::from_str(&serialized);
+        let bytefmt_json_de = serde_bytes_repr::ByteFmtDeserializer::new_hex(&mut json_de);
+
+        let kp2 = KeyPair::deserialize(bytefmt_json_de).unwrap();
+        assert_eq!(kp1.sk, kp2.sk);
+        assert_eq!(kp1.vk, kp2.vk);
+    }
+
+    #[cfg(all(feature = "serialization", feature = "std"))]
+    #[test]
+    fn dynamic_serde_serialization<P: Parameters>() {
+        let mut out = vec![];
+        let mut ser = serde_json::Serializer::new(&mut out);
+        let ser = serde_bytes_repr::ByteFmtSerializer::hex(&mut ser);
+
+        let (sk1, vk1) = DynamicSigningKey::random(P::PARAM).unwrap();
+        let kp1 = DynamicKeyPair { sk: sk1, vk: vk1 };
+        kp1.serialize(ser).unwrap();
+        let serialized = String::from_utf8(out).unwrap();
+
+        let mut json_de = serde_json::Deserializer::from_str(&serialized);
+        let bytefmt_json_de = serde_bytes_repr::ByteFmtDeserializer::new_hex(&mut json_de);
+
+        let kp2 = DynamicKeyPair::deserialize(bytefmt_json_de).unwrap();
+        assert_eq!(kp1, kp2);
+    }
+
     #[cfg(feature = "picnic")]
     #[instantiate_tests(<PicnicL1FS>)]
     mod picnic_l1_fs {}

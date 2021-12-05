@@ -65,6 +65,12 @@ use paste::paste;
 use picnic_sys::*;
 pub use signature::{self, Error};
 
+#[cfg(feature = "serialization")]
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+
+#[cfg(feature = "subtle")]
+use subtle::{Choice, ConstantTimeEq};
+
 mod wrapper;
 use crate::wrapper::*;
 
@@ -102,6 +108,7 @@ macro_rules! define_params {
         paste! {
             #[doc = $name " parameters"]
             #[derive(Debug, PartialEq, Eq)]
+            #[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
             pub struct $name {}
 
             impl Parameters for $name {
@@ -167,7 +174,10 @@ define_params!(Picnic3L5, Picnic3_L5, picnic_params_t::Picnic3_L5);
 /// While storing signatures in arrays is possible, their size varies even for the same parameter
 /// set.
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct DynamicSignature(Vec<u8>);
+#[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
+pub struct DynamicSignature(
+    #[cfg_attr(feature = "serialization", serde(with = "serde_bytes"))] Vec<u8>,
+);
 
 impl AsRef<[u8]> for DynamicSignature {
     fn as_ref(&self) -> &[u8] {
@@ -307,9 +317,6 @@ where
 impl<P> Eq for SigningKey<P> where P: Parameters {}
 
 #[cfg(feature = "subtle")]
-use subtle::{Choice, ConstantTimeEq};
-
-#[cfg(feature = "subtle")]
 impl<P> ConstantTimeEq for SigningKey<P>
 where
     P: Parameters,
@@ -317,6 +324,32 @@ where
     fn ct_eq(&self, other: &Self) -> Choice {
         self.data.as_ref().data[..P::PRIVATE_KEY_SIZE]
             .ct_eq(&other.data.as_ref().data[..P::PRIVATE_KEY_SIZE])
+    }
+}
+
+#[cfg(feature = "serialization")]
+impl<P> Serialize for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serialize(self, serializer)
+    }
+}
+
+#[cfg(feature = "serialization")]
+impl<'de, P> Deserialize<'de> for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserialize(deserializer)
     }
 }
 
@@ -400,6 +433,32 @@ where
 
 impl<P> Eq for VerificationKey<P> where P: Parameters {}
 
+#[cfg(feature = "serialization")]
+impl<P> Serialize for VerificationKey<P>
+where
+    P: Parameters,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serialize(self, serializer)
+    }
+}
+
+#[cfg(feature = "serialization")]
+impl<'de, P> Deserialize<'de> for VerificationKey<P>
+where
+    P: Parameters,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserialize(deserializer)
+    }
+}
+
 /// Signing key
 #[derive(Clone, Debug)]
 pub struct DynamicSigningKey {
@@ -472,6 +531,26 @@ impl PartialEq for DynamicSigningKey {
 
 impl Eq for DynamicSigningKey {}
 
+#[cfg(feature = "serialization")]
+impl Serialize for DynamicSigningKey {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serialize(self, serializer)
+    }
+}
+
+#[cfg(feature = "serialization")]
+impl<'de> Deserialize<'de> for DynamicSigningKey {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserialize(deserializer)
+    }
+}
+
 /// Verification key
 #[derive(Clone, Debug)]
 pub struct DynamicVerificationKey {
@@ -523,6 +602,77 @@ impl PartialEq for DynamicVerificationKey {
 }
 
 impl Eq for DynamicVerificationKey {}
+
+#[cfg(feature = "serialization")]
+impl Serialize for DynamicVerificationKey {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serialize(self, serializer)
+    }
+}
+
+#[cfg(feature = "serialization")]
+impl<'de> Deserialize<'de> for DynamicVerificationKey {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserialize(deserializer)
+    }
+}
+
+#[cfg(feature = "serialization")]
+fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    T: AsRef<[u8]>,
+    S: Serializer,
+{
+    serde_bytes::serialize(value.as_ref(), serializer)
+}
+
+#[cfg(feature = "serialization")]
+fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: for<'a> TryFrom<&'a [u8]>,
+    D: Deserializer<'de>,
+{
+    struct BytesVisitor<S>(PhantomData<S>);
+
+    impl<'de, S> de::Visitor<'de> for BytesVisitor<S>
+    where
+        S: for<'a> TryFrom<&'a [u8]>,
+    {
+        type Value = S;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            write!(formatter, "a byte array")
+        }
+
+        fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+        {
+            match S::try_from(v) {
+                Ok(t) => Ok(t),
+                Err(_) => Err(de::Error::invalid_value(de::Unexpected::Bytes(v), &self)),
+            }
+        }
+
+        fn visit_borrowed_bytes<E>(self, v: &'de [u8]) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+        {
+            match S::try_from(v) {
+                Ok(t) => Ok(t),
+                Err(_) => Err(de::Error::invalid_value(de::Unexpected::Bytes(v), &self)),
+            }
+        }
+    }
+
+    deserializer.deserialize_bytes(BytesVisitor::<T>(PhantomData))
+}
 
 #[cfg(test)]
 mod test {
