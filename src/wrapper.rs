@@ -2,14 +2,6 @@
 /// implementation.
 use picnic_sys::*;
 use signature::Error;
-use std::ffi::CStr;
-
-/// Obtain the "name" of a parameter set `param`
-pub(crate) fn parameter_name(param: picnic_params_t) -> &'static str {
-    // The string returned by `picnic_get_param_name` is always valid UTF-8 and has static lifetime.
-    let name = unsafe { CStr::from_ptr(picnic_get_param_name(param)) };
-    name.to_str().unwrap()
-}
 
 /// Obtain max signature size for a parameter set `param`
 pub(crate) fn signature_size(param: picnic_params_t) -> usize {
@@ -187,11 +179,6 @@ mod test {
     use super::*;
 
     #[test]
-    fn parameter_name_invalid() {
-        assert_ne!(parameter_name(picnic_params_t::PARAMETER_SET_INVALID), "");
-    }
-
-    #[test]
     fn keygen_invalid() {
         assert!(PrivateKey::random(picnic_params_t::PARAMETER_SET_INVALID).is_err());
     }
@@ -203,14 +190,6 @@ mod test {
         #[test]
         fn signature_size_non_zero() {
             assert!(signature_size(picnic_params_t::Picnic_L1_FS) > 0);
-        }
-
-        #[test]
-        fn parameter_name_matches() {
-            assert_eq!(
-                parameter_name(picnic_params_t::Picnic_L1_FS),
-                "Picnic_L1_FS"
-            );
         }
 
         #[test]

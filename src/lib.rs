@@ -73,9 +73,7 @@ pub trait Parameters {
     const PUBLIC_KEY_SIZE: usize;
 
     /// Retrieve name of the parameter set
-    fn parameter_name() -> String {
-        wrapper::parameter_name(Self::PARAM).into()
-    }
+    fn parameter_name() -> &'static str;
 }
 
 /// Extension of the [signature::Signer] trait that allows to retrieve to corresponding verifier
@@ -103,6 +101,10 @@ macro_rules! define_params {
                 const MAX_SIGNATURE_SIZE: usize = [<PICNIC_SIGNATURE_SIZE_ $param>];
                 const PRIVATE_KEY_SIZE: usize = [<PICNIC_PRIVATE_KEY_SIZE_ $param>];
                 const PUBLIC_KEY_SIZE: usize = [<PICNIC_PUBLIC_KEY_SIZE_ $param>];
+
+                fn parameter_name() -> &'static str {
+                        "$param"
+                }
             }
 
             #[doc = "Signing key for " $name]
