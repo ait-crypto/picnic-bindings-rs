@@ -107,7 +107,7 @@ macro_rules! define_params {
     ($name:ident, $param:ident, $realparam:expr) => {
         paste! {
             #[doc = $name " parameters"]
-            #[derive(Debug, PartialEq, Eq)]
+            #[derive(Clone, Debug, PartialEq, Eq)]
             #[cfg_attr(feature = "serialization", derive(Serialize, Deserialize))]
             pub struct $name {}
 
@@ -118,7 +118,7 @@ macro_rules! define_params {
                 const PUBLIC_KEY_SIZE: usize = [<PICNIC_PUBLIC_KEY_SIZE_ $param>];
 
                 fn parameter_name() -> &'static str {
-                        "$param"
+                    "$param"
                 }
             }
 
