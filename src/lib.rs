@@ -94,6 +94,7 @@ macro_rules! define_params {
     ($name:ident, $param:ident, $realparam:expr) => {
         paste! {
             #[doc = $name " parameters"]
+            #[derive(Debug, PartialEq, Eq)]
             pub struct $name {}
 
             impl Parameters for $name {
