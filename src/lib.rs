@@ -46,13 +46,20 @@
 //! # }
 //! ```
 
+#![no_std]
 #![warn(missing_docs)]
 
 // If neither is specified, the crate is essentially empty.
 #[cfg(all(not(feature = "picnic"), not(feature = "picnic3")))]
 compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
 
-use core::fmt::{Debug, Formatter};
+extern crate alloc;
+
+#[cfg(feature = "std")]
+extern crate std;
+
+use alloc::{fmt, format, vec, vec::Vec};
+use core::fmt::Debug;
 use core::marker::PhantomData;
 use paste::paste;
 use picnic_sys::*;
@@ -280,7 +287,7 @@ impl<P> Debug for SigningKey<P>
 where
     P: Parameters,
 {
-    fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct(&format!("SigningKey<{}>", P::parameter_name()))
             .field("data", &self.data)
             .finish()
@@ -374,7 +381,7 @@ impl<P> Debug for VerificationKey<P>
 where
     P: Parameters,
 {
-    fn fmt(&self, fmt: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct(&format!("VerificationKey<{}>", P::parameter_name()))
             .field("data", &self.data)
             .finish()
