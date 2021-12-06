@@ -46,7 +46,7 @@
 //! # }
 //! ```
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(all(not(feature = "std"), not(test)), no_std)]
 #![warn(missing_docs)]
 
 // If neither is specified, the crate is essentially empty.

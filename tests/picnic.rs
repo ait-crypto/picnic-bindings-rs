@@ -118,7 +118,7 @@ mod tests {
         assert!(!bool::from(sk1.ct_eq(&sk2)));
     }
 
-    #[cfg(all(feature = "serialization", feature = "std"))]
+    #[cfg(feature = "serialization")]
     mod serialization_helpers {
         use super::*;
         use serde::{de, ser::SerializeStruct, Deserializer, Serializer};
@@ -222,10 +222,10 @@ mod tests {
         }
     }
 
-    #[cfg(all(feature = "serialization", feature = "std"))]
+    #[cfg(feature = "serialization")]
     use serialization_helpers::{Deserialize, DynamicKeyPair, KeyPair, Serialize};
 
-    #[cfg(all(feature = "serialization", feature = "std"))]
+    #[cfg(feature = "serialization")]
     #[test]
     fn serde_serialization<P: Parameters>() {
         let mut out = vec![];
@@ -245,7 +245,7 @@ mod tests {
         assert_eq!(kp1.vk, kp2.vk);
     }
 
-    #[cfg(all(feature = "serialization", feature = "std"))]
+    #[cfg(feature = "serialization")]
     #[test]
     fn dynamic_serde_serialization<P: Parameters>() {
         let mut out = vec![];
