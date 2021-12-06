@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 (2021-12-06)
+
+* Add `RawVerifier` trait and implementations for `VerificationKey<P>` and `DynamicVerificationKey`.
+
 ## 0.4 (2021-12-06)
 
 * Make it possible to build as `no_std` crate. The `alloc` crate is still required, though.
