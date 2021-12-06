@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4 (2021-12-06)
+
+* Make it possible to build as `no_std` crate. The `alloc` crate is still required, though.
+* Implement serialization with `serde`.
+* Implement constant-time comparison for `SigningKey<P>` using `subtle`.
+* Bump edition to 2021 and require Rust 1.56.
+
 ## 0.3 (2021-11-05)
 
 * Provide conversion from/to `&[u8]` for `DynamicSigningKey` and `DynamicVerificationKey`.
