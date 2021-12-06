@@ -107,6 +107,14 @@ where
     fn verifier(&self) -> Result<Self::Verifier, Error>;
 }
 
+/// Trait that allows to directly verify a signature from a `&[u8]`
+///
+/// With this trait verifiers are able to verify a signature without first storing it in a `Vec`.
+pub trait RawVerifier {
+    /// Verify a "raw" signature
+    fn verify_raw(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error>;
+}
+
 /// Define a parameters set and its associated implementations and types
 // $realparam should be replaced by [<picnic_params_t:: $param>] but that does not compile.
 macro_rules! define_params {
@@ -371,7 +379,16 @@ where
     P: Parameters,
 {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
-        self.data.verify(msg, &signature.0)
+        self.verify_raw(msg, &signature.0)
+    }
+}
+
+impl<P> RawVerifier for VerificationKey<P>
+where
+    P: Parameters,
+{
+    fn verify_raw(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error> {
+        self.data.verify(msg, signature)
     }
 }
 
@@ -565,7 +582,13 @@ pub struct DynamicVerificationKey {
 
 impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
-        self.data.verify(msg, &signature.0)
+        self.verify_raw(msg, &signature.0)
+    }
+}
+
+impl RawVerifier for DynamicVerificationKey {
+    fn verify_raw(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error> {
+        self.data.verify(msg, signature)
     }
 }
 

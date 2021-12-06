@@ -2,8 +2,8 @@
 mod tests {
     use picnic_bindings::{
         signature::{Signer as BaseSigner, Verifier},
-        DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, Signer,
-        SigningKey, VerificationKey,
+        DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, RawVerifier,
+        Signer, SigningKey, VerificationKey,
     };
 
     const TEST_MESSAGE: &[u8] = "test message".as_bytes();
@@ -46,6 +46,7 @@ mod tests {
         let (sk, vk) = SigningKey::<P>::random().unwrap();
         let signature = sk.sign(TEST_MESSAGE);
         vk.verify(TEST_MESSAGE, &signature).unwrap();
+        vk.verify_raw(TEST_MESSAGE, signature.as_ref()).unwrap();
     }
 
     #[test]
@@ -53,6 +54,7 @@ mod tests {
         let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
         let signature = sk.sign(TEST_MESSAGE);
         vk.verify(TEST_MESSAGE, &signature).unwrap();
+        vk.verify_raw(TEST_MESSAGE, signature.as_ref()).unwrap();
     }
 
     #[test]
