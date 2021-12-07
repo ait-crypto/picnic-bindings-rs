@@ -72,13 +72,19 @@ use picnic_sys::*;
 pub use signature::{self, Error};
 
 #[cfg(feature = "serialization")]
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[cfg(feature = "subtle")]
 use subtle::{Choice, ConstantTimeEq};
 
 mod wrapper;
 use crate::wrapper::*;
+
+#[cfg(feature = "serialization")]
+mod serialization;
+
+#[cfg(feature = "serialization")]
+use serialization::{deserialize, serialize};
 
 /// Trait to describe Picnic parameters
 pub trait Parameters {
@@ -650,57 +656,6 @@ impl<'de> Deserialize<'de> for DynamicVerificationKey {
     {
         deserialize(deserializer)
     }
-}
-
-#[cfg(feature = "serialization")]
-fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
-where
-    T: AsRef<[u8]>,
-    S: Serializer,
-{
-    serde_bytes::serialize(value.as_ref(), serializer)
-}
-
-#[cfg(feature = "serialization")]
-fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-where
-    T: for<'a> TryFrom<&'a [u8]>,
-    D: Deserializer<'de>,
-{
-    struct BytesVisitor<S>(PhantomData<S>);
-
-    impl<'de, S> de::Visitor<'de> for BytesVisitor<S>
-    where
-        S: for<'a> TryFrom<&'a [u8]>,
-    {
-        type Value = S;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            write!(formatter, "a byte array")
-        }
-
-        fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
-        where
-            E: de::Error,
-        {
-            match S::try_from(v) {
-                Ok(t) => Ok(t),
-                Err(_) => Err(de::Error::invalid_value(de::Unexpected::Bytes(v), &self)),
-            }
-        }
-
-        fn visit_borrowed_bytes<E>(self, v: &'de [u8]) -> Result<Self::Value, E>
-        where
-            E: de::Error,
-        {
-            match S::try_from(v) {
-                Ok(t) => Ok(t),
-                Err(_) => Err(de::Error::invalid_value(de::Unexpected::Bytes(v), &self)),
-            }
-        }
-    }
-
-    deserializer.deserialize_bytes(BytesVisitor::<T>(PhantomData))
 }
 
 #[cfg(test)]
