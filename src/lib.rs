@@ -207,7 +207,7 @@ impl AsRef<[u8]> for DynamicSignature {
 
 impl From<&[u8]> for DynamicSignature {
     fn from(bytes: &[u8]) -> Self {
-        Self { 0: bytes.into() }
+        Self(bytes.into())
     }
 }
 
