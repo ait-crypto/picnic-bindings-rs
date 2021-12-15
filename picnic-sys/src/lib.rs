@@ -168,7 +168,7 @@ mod tests {
             assert_eq!(picnic_get_private_key_param(&sk), params);
             assert_eq!(picnic_get_public_key_param(&pk), params);
 
-            let mut length: size_t = picnic_signature_size(params);
+            let mut length = picnic_signature_size(params);
             assert!(length > 0);
             let msg = b"message";
             let mut signature = vec![0; length];
