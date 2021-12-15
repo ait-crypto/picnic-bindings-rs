@@ -26,7 +26,3 @@ picnic3 = []
 unruh-transform = ["picnic"]
 system = ["pkg-config"]
 static-fallback = ["cc"]
-docs-rs = []
-
-[package.metadata.docs.rs]
-features = ["docs-rs"]

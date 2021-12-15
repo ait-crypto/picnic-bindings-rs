@@ -1,6 +1,6 @@
 #[cfg(not(feature = "docs-rs"))]
 #[cfg(feature = "static-fallback")]
-fn download_and_build() {
+fn build() {
     let src = std::path::Path::new("Picnic");
     let target = std::env::var("TARGET").unwrap();
     let profile = std::env::var("PROFILE").unwrap();
@@ -28,7 +28,8 @@ fn download_and_build() {
         build.define("WITH_NEON", None);
     }
 
-    let mut files: std::collections::HashSet<&str> = std::collections::HashSet::new();
+    use std::collections::HashSet;
+    let mut files: HashSet<&str> = HashSet::new();
     files.extend(
         [
             "bitstream.c",
@@ -103,12 +104,6 @@ fn download_and_build() {
     }
 }
 
-#[cfg(feature = "docs-rs")]
-fn main() {
-    // Skip the script when docs are built on docs.rs
-}
-
-#[cfg(not(feature = "docs-rs"))]
 fn main() {
     #[cfg(feature = "system")]
     // Try to find shared library via pkg-config
@@ -122,7 +117,7 @@ fn main() {
 
     #[cfg(feature = "static-fallback")]
     // Download and build static library
-    download_and_build();
+    build();
     #[cfg(not(feature = "static-fallback"))]
     panic!("Unable to find library with pkg-config and static-fallback is not enabled!")
 }
