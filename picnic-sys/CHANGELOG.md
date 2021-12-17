@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.8 (2021-12-17)
+
+* Bump Picnic to 3.0.8.
+* Remove unused `doc-rs` feature.
+
 ## 3.0.7 (2021-12-15)
 
 * Bump Picnic to 3.0.6.
