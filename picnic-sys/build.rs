@@ -32,7 +32,6 @@ fn build() {
     let mut files: HashSet<&str> = HashSet::new();
     files.extend(
         [
-            "bitstream.c",
             "compat.c",
             "cpu.c",
             "io.c",
