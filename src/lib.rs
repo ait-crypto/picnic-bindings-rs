@@ -268,7 +268,7 @@ where
 
         let length = self.data.try_sign(msg, signature.as_mut_slice())?;
         signature.resize(length, 0);
-        Ok(DynamicSignature { 0: signature })
+        Ok(DynamicSignature(signature))
     }
 }
 
@@ -516,7 +516,7 @@ impl signature::Signer<DynamicSignature> for DynamicSigningKey {
         let mut signature = vec![0; signature_size(self.param())];
         let length = self.data.try_sign(msg, signature.as_mut_slice())?;
         signature.resize(length, 0);
-        Ok(DynamicSignature { 0: signature })
+        Ok(DynamicSignature(signature))
     }
 }
 

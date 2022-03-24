@@ -59,11 +59,9 @@ impl PrivateKey {
 
 impl Default for PrivateKey {
     fn default() -> Self {
-        Self {
-            0: picnic_privatekey_t {
-                data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
-            },
-        }
+        Self(picnic_privatekey_t {
+            data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
+        })
     }
 }
 
@@ -132,11 +130,9 @@ impl PublicKey {
 
 impl Default for PublicKey {
     fn default() -> Self {
-        Self {
-            0: picnic_publickey_t {
-                data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
-            },
-        }
+        Self(picnic_publickey_t {
+            data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
+        })
     }
 }
 
