@@ -10,6 +10,7 @@ use serde::{
     Deserializer, Serializer,
 };
 
+/// Serialize a value as bytes
 pub(crate) fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
 where
     T: AsRef<[u8]>,
@@ -45,6 +46,7 @@ where
     }
 }
 
+/// Deserialize a value from its byte representation
 pub(crate) fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
 where
     T: for<'a> TryFrom<&'a [u8]>,

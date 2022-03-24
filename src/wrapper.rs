@@ -22,6 +22,7 @@ pub(crate) trait PicnicKey {
 pub(crate) struct PrivateKey(picnic_privatekey_t);
 
 impl PrivateKey {
+    /// Sample a fresh key pair
     pub(crate) fn random(param: picnic_params_t) -> Result<(PrivateKey, PublicKey), Error> {
         let mut sk = PrivateKey::default();
         let mut vk = PublicKey::default();
@@ -32,6 +33,7 @@ impl PrivateKey {
         }
     }
 
+    /// Try to sign a message. The provided signature buffer needs to large enough to hold the signature.
     pub(crate) fn try_sign(&self, msg: &[u8], signature: &mut [u8]) -> Result<size_t, Error> {
         let mut length: size_t = signature.len();
         match unsafe {
@@ -48,6 +50,7 @@ impl PrivateKey {
         }
     }
 
+    /// Compute the `PublicKey` from a `PrivateKey`
     pub(crate) fn public_key(&self) -> Result<PublicKey, Error> {
         let mut vk = PublicKey::default();
         match unsafe { picnic_sk_to_pk(self.as_ref(), vk.as_mut()) } {
@@ -112,6 +115,7 @@ impl PicnicKey for PrivateKey {
 pub(crate) struct PublicKey(picnic_publickey_t);
 
 impl PublicKey {
+    /// Verify the signature on a message
     pub(crate) fn verify(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error> {
         match unsafe {
             picnic_verify(
