@@ -7,6 +7,9 @@
 //! More information on Picnic is available on the project website:
 //! <https://microsoft.github.io/Picnic/>
 //!
+//! Serialization and deserialization is implemented via the `serde` crate. By enabling the
+//! `serialization` feature, all public structs implement the `Serialize` and `Deserialize` traits.
+//!
 //! ## Usage
 //!
 //! Key generation, signing and verification can be implemented as follows:
@@ -43,6 +46,22 @@
 //! let msg = "some message".as_bytes();
 //! let signature = signing_key.sign(msg);
 //! verification_key.verify(msg, &signature).expect("Verification failed");
+//! # }
+//! ```
+//!
+//! In case a signature as only available as `&[u8]` and taking ownership is not desired, the
+//! [RawVerifier] trait offers a method to verify the signature without first converting it into an
+//! instance of [DynamicSignature].
+//! ```
+//! # #[cfg(feature="picnic")] {
+//! use picnic_bindings::{PicnicL1FSSigningKey, signature::Signer, RawVerifier};
+//!
+//! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
+//! let msg = "some message".as_bytes();
+//! let signature = signing_key.sign(msg);
+//! // assume that this is the actual signature
+//! let signature = signature.as_ref();
+//! verification_key.verify_raw(msg, signature).expect("Verification failed");
 //! # }
 //! ```
 
@@ -115,7 +134,8 @@ where
 
 /// Trait that allows to directly verify a signature from a `&[u8]`
 ///
-/// With this trait verifiers are able to verify a signature without first storing it in a `Vec`.
+/// With this trait verifiers are able to verify a signature without first storing it in a
+/// [DynamicSignature] to satisfy the [signature::Verifier] interface.
 pub trait RawVerifier {
     /// Verify a "raw" signature
     fn verify_raw(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error>;

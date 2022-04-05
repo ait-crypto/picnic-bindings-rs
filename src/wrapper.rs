@@ -1,5 +1,6 @@
-/// This module provides a very thin wrapper and contains all the unsafe calls to the picnic
-/// implementation.
+//! This module provides a very thin wrapper and contains all the unsafe calls to the picnic
+//! implementation.
+
 use picnic_sys::*;
 use signature::Error;
 

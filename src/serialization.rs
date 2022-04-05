@@ -1,3 +1,7 @@
+//! This modules provides some helpers for serialization and deserialization of keys and signatures.
+//!
+//! The module is only included if the `serialization` feature is active.
+
 #[cfg(not(feature = "std"))]
 use alloc::fmt;
 
@@ -19,6 +23,7 @@ where
     serde_bytes::serialize(value.as_ref(), serializer)
 }
 
+/// Helper for the implementation of [serde]'s [Visitor] trait
 struct BytesVisitor<T>(PhantomData<T>);
 
 impl<'de, T> Visitor<'de> for BytesVisitor<T>
