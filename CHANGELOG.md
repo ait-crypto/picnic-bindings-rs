@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2 (2022-04-05)
+
+* Extend the documentation with an example for `RawVerifier`.
+* Refactor serialization (no functional change).
+
 ## 0.4.1 (2021-12-06)
 
 * Add `RawVerifier` trait and implementations for `VerificationKey<P>` and `DynamicVerificationKey`.
