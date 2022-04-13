@@ -72,6 +72,39 @@ jobs:
           command: test
           args: --all-features
 
+  build-cross:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - aarch64-unknown-linux-gnu
+          - armv7-unknown-linux-gnueabihf
+          - powerpc64le-unknown-linux-gnu
+          - i686-unknown-linux-gnu
+          - mips64el-unknown-linux-gnuabi64
+    name: Cross build for ${{matrix.target}})
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: ${{matrix.target}}
+      - uses: Swatinem/rust-cache@v1
+      - name: Build with default features
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --workspace
+      - name: Build with all features
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --all-features
+
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
