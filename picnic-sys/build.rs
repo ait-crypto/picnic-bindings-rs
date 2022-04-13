@@ -9,7 +9,9 @@ fn build() {
     let profile = env::var("PROFILE").unwrap();
     let pointer_width = env::var("CARGO_CFG_TARGET_POINTER_WIDTH")
         .and_then(|s| Ok(s.parse::<u32>().unwrap_or(64)))
-        .unwrap_or(64);
+        .unwrap();
+    let target_cpu = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+
     let mut build = cc::Build::new();
     build.static_flag(true);
     build.define("PICNIC_STATIC", None);
@@ -25,14 +27,14 @@ fn build() {
         build.opt_level(3);
     }
 
-    if cfg!(target_feature = "sse2") {
+    if target_cpu == "x86" || target_cpu == "x86_64" {
         build.define("WITH_OPT", None);
         build.define("WITH_SSE2", None);
-        if cfg!(target_feature = "avx2") && cfg!(target_feature = "bmi2") {
+        if target_cpu == "x86_64" {
             build.define("WITH_AVX2", None);
         }
     }
-    if cfg!(target_feature = "neon") {
+    if target_cpu == "aarch64" {
         build.define("WITH_OPT", None);
         build.define("WITH_NEON", None);
     }
