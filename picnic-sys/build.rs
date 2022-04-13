@@ -1,16 +1,26 @@
 #[cfg(feature = "static-fallback")]
 fn build() {
-    let src = std::path::Path::new("Picnic");
-    let target = std::env::var("TARGET").unwrap();
-    let profile = std::env::var("PROFILE").unwrap();
+    use std::collections::HashSet;
+    use std::env;
+    use std::path::Path;
 
+    let src = Path::new("Picnic");
+    let target = env::var("TARGET").unwrap();
+    let profile = env::var("PROFILE").unwrap();
+    let pointer_width = env::var("CARGO_CFG_TARGET_POINTER_WIDTH")
+        .and_then(|s| Ok(s.parse::<u32>().unwrap_or(64)))
+        .unwrap_or(64);
     let mut build = cc::Build::new();
     build.static_flag(true);
     build.define("PICNIC_STATIC", None);
     build.define("NDEBUG", None);
     build.define("WITH_KECCAK_X4", None);
     build.include(src.join("sha3"));
-    build.include(src.join("sha3/opt64"));
+    if pointer_width == 32 {
+        build.include(src.join("sha3/plain32"));
+    } else {
+        build.include(src.join("sha3/opt64"));
+    }
     if profile == "release" {
         build.opt_level(3);
     }
@@ -27,7 +37,6 @@ fn build() {
         build.define("WITH_NEON", None);
     }
 
-    use std::collections::HashSet;
     let mut files: HashSet<&str> = HashSet::new();
     files.extend(
         [
@@ -43,11 +52,26 @@ fn build() {
             "sha3/KeccakSponge.c",
             "sha3/KeccakSpongetimes4.c",
             "sha3/KeccakHashtimes4.c",
-            "sha3/opt64/KeccakP-1600-opt64.c",
-            "sha3/opt64/KeccakP-1600-times4-on1.c",
         ]
         .iter(),
     );
+    if pointer_width == 32 {
+        files.extend(
+            [
+                "sha3/plain32/KeccakP-1600-inplace32BI.c",
+                "sha3/plain32/KeccakP-1600-times4-on1.c",
+            ]
+            .iter(),
+        );
+    } else {
+        files.extend(
+            [
+                "sha3/opt64/KeccakP-1600-opt64.c",
+                "sha3/opt64/KeccakP-1600-times4-on1.c",
+            ]
+            .iter(),
+        );
+    }
 
     if cfg!(feature = "picnic") {
         files.extend(
