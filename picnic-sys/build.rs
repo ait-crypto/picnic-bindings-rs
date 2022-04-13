@@ -1,4 +1,3 @@
-#[cfg(not(feature = "docs-rs"))]
 #[cfg(feature = "static-fallback")]
 fn build() {
     let src = std::path::Path::new("Picnic");
