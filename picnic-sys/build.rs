@@ -8,7 +8,7 @@ fn build() {
     let target = env::var("TARGET").unwrap();
     let profile = env::var("PROFILE").unwrap();
     let pointer_width = env::var("CARGO_CFG_TARGET_POINTER_WIDTH")
-        .and_then(|s| Ok(s.parse::<u32>().unwrap_or(64)))
+        .map(|s| s.parse::<u32>().unwrap_or(64))
         .unwrap();
     let target_cpu = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
 
