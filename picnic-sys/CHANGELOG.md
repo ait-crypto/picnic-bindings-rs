@@ -4,6 +4,7 @@
 
 * Bump Picnic to 3.0.13.
 * Fix AVX2/SSE2/NEON activation while cross compiling.
+* Disable use of `__builtin_cpu_supports`. When cross compiling, the toolchain does not seem to link the necessary libraries.
 
 ## 3.0.12 (2022-04-05)
 
