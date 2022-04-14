@@ -83,6 +83,7 @@ jobs:
           - i686-unknown-linux-gnu
           - mips64el-unknown-linux-gnuabi64
           - powerpc64le-unknown-linux-gnu
+          - arm-linux-androideabi
     name: Cross test for ${{matrix.target}})
     steps:
       - uses: actions/checkout@v2
