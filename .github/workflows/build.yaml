@@ -75,6 +75,7 @@ jobs:
   build-cross:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         target:
           - aarch64-apple-darwin
