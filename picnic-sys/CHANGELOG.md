@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.13 (2022-04-15)
+
+* Bump Picnic to 3.0.13.
+* Fix AVX2/SSE2/NEON activation while cross compiling.
+
 ## 3.0.12 (2022-04-05)
 
 * Bump Picnic to 3.0.12.
