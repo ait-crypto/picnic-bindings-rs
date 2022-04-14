@@ -100,13 +100,13 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --workspace
+          args: --workspace --target ${{matrix.target}}
       - name: Build with all features
         uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
-          args: --all-features
+          args: --all-features --target ${{matrix.target}}
 
   fmt:
     name: Rustfmt
