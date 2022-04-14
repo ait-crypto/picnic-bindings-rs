@@ -17,6 +17,10 @@ fn build() {
     build.define("PICNIC_STATIC", None);
     build.define("NDEBUG", None);
     build.define("WITH_KECCAK_X4", None);
+    if target_cpu.starts_with("arm") && pointer_width == 32 {
+        // 32 bit ARM is in general unhappy with unaligned access
+        build.define("NO_MISALIGNED_ACCESSES", None);
+    }
     build.include(src.join("sha3"));
     if pointer_width == 32 {
         build.include(src.join("sha3/plain32"));
