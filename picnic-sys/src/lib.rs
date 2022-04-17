@@ -167,6 +167,7 @@ mod tests {
             assert_eq!(picnic_keygen(params, &mut pk, &mut sk), 0);
             assert_eq!(picnic_get_private_key_param(&sk), params);
             assert_eq!(picnic_get_public_key_param(&pk), params);
+            assert_eq!(picnic_validate_keypair(&sk, &pk), 0);
 
             let mut length = picnic_signature_size(params);
             assert!(length > 0);
