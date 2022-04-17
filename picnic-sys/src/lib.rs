@@ -169,9 +169,10 @@ mod tests {
             assert_eq!(picnic_get_public_key_param(&pk), params);
             assert_eq!(picnic_validate_keypair(&sk, &pk), 0);
 
-            let mut length = picnic_signature_size(params);
-            assert!(length > 0);
+            let max_length = picnic_signature_size(params);
+            assert!(max_length > 0);
             let msg = b"message";
+            let mut length = max_length;
             let mut signature = vec![0; length];
             assert_eq!(
                 picnic_sign(
@@ -183,6 +184,8 @@ mod tests {
                 ),
                 0
             );
+            assert!(length > 0);
+            assert!(length <= max_length);
             assert_eq!(
                 picnic_verify(&pk, msg.as_ptr(), msg.len(), signature.as_ptr(), length),
                 0
