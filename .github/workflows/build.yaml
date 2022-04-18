@@ -17,6 +17,8 @@ jobs:
     name: Test w. shared library (${{matrix.toolchain}} toolchain)
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -84,7 +86,7 @@ jobs:
           - mips64el-unknown-linux-gnuabi64
           - powerpc64le-unknown-linux-gnu
           - arm-linux-androideabi
-    name: Cross test for ${{matrix.target}})
+    name: Cross test for ${{matrix.target}}
     steps:
       - uses: actions/checkout@v2
         with:
