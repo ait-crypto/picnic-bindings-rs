@@ -156,7 +156,8 @@ mod tests {
     fn run_basic_test(params: picnic_params_t) {
         unsafe {
             assert!(picnic_get_private_key_size(params) > 0);
-            assert!(picnic_get_public_key_size(params) > 0);
+            let pk_size = picnic_get_public_key_size(params);
+            assert!(pk_size > 0);
 
             let mut sk = picnic_privatekey_t {
                 data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
@@ -164,10 +165,15 @@ mod tests {
             let mut pk = picnic_publickey_t {
                 data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
             };
+            let mut pk2 = picnic_publickey_t {
+                data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
+            };
             assert_eq!(picnic_keygen(params, &mut pk, &mut sk), 0);
             assert_eq!(picnic_get_private_key_param(&sk), params);
             assert_eq!(picnic_get_public_key_param(&pk), params);
             assert_eq!(picnic_validate_keypair(&sk, &pk), 0);
+            assert_eq!(picnic_sk_to_pk(&sk, &mut pk2), 0);
+            assert_eq!(pk.data[0..pk_size], pk2.data[0..pk_size]);
 
             let max_length = picnic_signature_size(params);
             assert!(max_length > 0);
