@@ -1,8 +1,8 @@
 use picnic_sys::{
-    picnic_get_private_key_param, picnic_get_public_key_param, picnic_params_t,
-    picnic_privatekey_t, picnic_publickey_t, picnic_read_private_key, picnic_read_public_key,
-    picnic_sign, picnic_signature_size, picnic_validate_keypair, picnic_verify,
-    PICNIC_MAX_PRIVATEKEY_SIZE, PICNIC_MAX_PUBLICKEY_SIZE,
+    picnic_get_private_key_param, picnic_get_public_key_param, picnic_get_public_key_size,
+    picnic_params_t, picnic_privatekey_t, picnic_publickey_t, picnic_read_private_key,
+    picnic_read_public_key, picnic_sign, picnic_signature_size, picnic_sk_to_pk,
+    picnic_validate_keypair, picnic_verify, PICNIC_MAX_PRIVATEKEY_SIZE, PICNIC_MAX_PUBLICKEY_SIZE,
 };
 
 #[derive(Default, Clone)]
@@ -81,6 +81,13 @@ fn run_test(param: picnic_params_t, kat: TestVector) {
     assert_eq!(unsafe { picnic_validate_keypair(&sk, &pk) }, 0);
     assert_eq!(unsafe { picnic_get_public_key_param(&pk) }, param);
     assert_eq!(unsafe { picnic_get_private_key_param(&sk) }, param);
+
+    let mut pk2 = picnic_publickey_t {
+        data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
+    };
+    let pk_len = unsafe { picnic_get_public_key_size(param) };
+    assert_eq!(unsafe { picnic_sk_to_pk(&sk, &mut pk2) }, 0);
+    assert_eq!(&pk2.data[..pk_len], &pk.data[..pk_len]);
 
     // signatures in test vectors is: 4 bytes length, message, signature
     let original_sig = &kat.sm[4 + kat.message.len()..];
