@@ -26,14 +26,11 @@ fn read_kats(kats: &str) -> Vec<TestVector> {
         if line.is_empty() || line.starts_with('#') {
             continue;
         }
-        // ignore seed, message and signature lengths
-        if line.starts_with("mlen") || line.starts_with("seed") || line.starts_with("smlen") {
-            continue;
-        }
 
         let (kind, value) = line.split_once(" = ").expect("kind = value");
         match kind {
-            "count" => {}
+            // ignore count, message and signature lenghts, and seed
+            "count" | "mlen" | "seed" | "smlen" => {}
             "sk" => {
                 kat.sk = parse_hex(value);
             }
