@@ -115,8 +115,10 @@ mod tests {
 
         let (sk1, _vk1) = SigningKey::<P>::random().unwrap();
         let (sk2, _vk2) = SigningKey::<P>::random().unwrap();
+        let sk3 = sk1.clone();
 
         assert!(bool::from(sk1.ct_eq(&sk1)));
+        assert!(bool::from(sk1.ct_eq(&sk3)));
         assert!(!bool::from(sk1.ct_eq(&sk2)));
     }
 
