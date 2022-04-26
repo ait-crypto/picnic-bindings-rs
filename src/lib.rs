@@ -233,7 +233,7 @@ impl From<&[u8]> for DynamicSignature {
 
 impl signature::Signature for DynamicSignature {
     fn from_bytes(bytes: &[u8]) -> Result<Self, Error> {
-        Ok(DynamicSignature::from(bytes))
+        Ok(Self::from(bytes))
     }
 }
 
