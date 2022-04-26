@@ -342,7 +342,7 @@ where
 {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct(&format!("SigningKey<{}>", P::parameter_name()))
-            .field("data", &self.data)
+            .field("data", &"[...]")
             .finish()
     }
 }
@@ -512,9 +512,18 @@ where
 }
 
 /// Signing key
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct DynamicSigningKey {
     data: PrivateKey,
+}
+
+impl Debug for DynamicSigningKey {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt.debug_struct("DynamicSigningKey")
+            .field("param", &self.param())
+            .field("data", &"[...]")
+            .finish()
+    }
 }
 
 impl DynamicSigningKey {

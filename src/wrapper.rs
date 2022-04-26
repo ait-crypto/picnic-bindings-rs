@@ -19,7 +19,7 @@ pub(crate) trait PicnicKey {
 }
 
 /// Newtype pattern for `picnic_privatekey_t`
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub(crate) struct PrivateKey(picnic_privatekey_t);
 
 impl PrivateKey {
