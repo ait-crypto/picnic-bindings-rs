@@ -106,7 +106,7 @@ mod serialization;
 use serialization::{deserialize, serialize};
 
 /// Trait to describe Picnic parameters
-pub trait Parameters {
+pub trait Parameters: Clone {
     /// Internal parameter
     const PARAM: picnic_params_t;
     /// Max size of a signature
