@@ -15,6 +15,8 @@ fn build() {
     let mut build = cc::Build::new();
     build.static_flag(true);
     build.flag_if_supported("-std=gnu11");
+    build.flag_if_supported("-fstack-protector-strong");
+    build.define("_FORTIFY_SOURCE", Some("2"));
     build.define("WITHOUT_BUILTIN_CPU_SUPPORTS", None);
     build.define("PICNIC_STATIC", None);
     build.define("NDEBUG", None);
