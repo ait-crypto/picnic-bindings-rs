@@ -87,7 +87,7 @@ pub struct picnic_publickey_t {
 }
 
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct picnic_privatekey_t {
     pub data: [u8; PICNIC_MAX_PRIVATEKEY_SIZE],
 }
