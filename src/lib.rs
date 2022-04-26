@@ -264,9 +264,12 @@ where
     }
 }
 
-impl<P> Signer<DynamicSignature> for SigningKey<P>
+impl<P, S> Signer<S> for SigningKey<P>
 where
     P: Parameters,
+    S: signature::Signature,
+    SigningKey<P>: signature::Signer<S>,
+    VerificationKey<P>: signature::Verifier<S>,
 {
     type Verifier = VerificationKey<P>;
 
