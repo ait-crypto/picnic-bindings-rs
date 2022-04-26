@@ -352,8 +352,7 @@ where
     P: Parameters,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.data.as_ref().data[..P::PRIVATE_KEY_SIZE]
-            == other.data.as_ref().data[..P::PRIVATE_KEY_SIZE]
+        self.as_ref() == other.as_ref()
     }
 }
 
@@ -365,8 +364,7 @@ where
     P: Parameters,
 {
     fn ct_eq(&self, other: &Self) -> Choice {
-        self.data.as_ref().data[..P::PRIVATE_KEY_SIZE]
-            .ct_eq(&other.data.as_ref().data[..P::PRIVATE_KEY_SIZE])
+        self.as_ref().ct_eq(other.as_ref())
     }
 }
 
@@ -478,8 +476,7 @@ where
     P: Parameters,
 {
     fn eq(&self, other: &Self) -> bool {
-        self.data.as_ref().data[..P::PUBLIC_KEY_SIZE]
-            == other.data.as_ref().data[..P::PUBLIC_KEY_SIZE]
+        self.as_ref() == other.as_ref()
     }
 }
 
