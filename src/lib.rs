@@ -265,6 +265,17 @@ where
     }
 }
 
+impl<P> Verifier<DynamicSignature> for SigningKey<P>
+where
+    P: Parameters,
+{
+    fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
+        self.data
+            .public_key()
+            .and_then(|pk| pk.verify(msg, signature.as_ref()))
+    }
+}
+
 impl<P> PicnicKey for SigningKey<P>
 where
     P: Parameters,
@@ -521,6 +532,14 @@ impl Signer<DynamicSignature> for DynamicSigningKey {
         let length = self.data.try_sign(msg, signature.as_mut_slice())?;
         signature.resize(length, 0);
         Ok(DynamicSignature(signature))
+    }
+}
+
+impl Verifier<DynamicSignature> for DynamicSigningKey {
+    fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
+        self.data
+            .public_key()
+            .and_then(|pk| pk.verify(msg, signature.as_ref()))
     }
 }
 

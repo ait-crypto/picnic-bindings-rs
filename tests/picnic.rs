@@ -46,6 +46,7 @@ mod tests {
         let signature = sk.sign(TEST_MESSAGE);
         vk.verify(TEST_MESSAGE, &signature).unwrap();
         vk.verify_raw(TEST_MESSAGE, signature.as_ref()).unwrap();
+        sk.verify(TEST_MESSAGE, &signature).unwrap();
     }
 
     #[test]
@@ -54,6 +55,7 @@ mod tests {
         let signature = sk.sign(TEST_MESSAGE);
         vk.verify(TEST_MESSAGE, &signature).unwrap();
         vk.verify_raw(TEST_MESSAGE, signature.as_ref()).unwrap();
+        sk.verify(TEST_MESSAGE, &signature).unwrap();
     }
 
     #[test]
