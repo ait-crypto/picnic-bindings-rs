@@ -15,7 +15,7 @@
 //! Key generation, signing and verification can be implemented as follows:
 //! ```
 //! # #[cfg(feature="picnic")] {
-//! use picnic_bindings::{PicnicL1FSSigningKey, signature::{Signer, Verifier}};
+//! use picnic_bindings::{PicnicL1FSSigningKey, Signer, Verifier};
 //!
 //! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
 //! let msg = "some message".as_bytes();
@@ -40,7 +40,7 @@
 //! Alternatively:
 //! ```
 //! # #[cfg(feature="picnic")] {
-//! use picnic_bindings::{DynamicSigningKey, PicnicL1FS, Parameters, signature::{Signer, Verifier}};
+//! use picnic_bindings::{DynamicSigningKey, PicnicL1FS, Parameters, Signer, Verifier};
 //!
 //! let (signing_key, verification_key) = DynamicSigningKey::random(PicnicL1FS::PARAM).expect("Key generation failed");
 //! let msg = "some message".as_bytes();
@@ -54,7 +54,7 @@
 //! instance of [DynamicSignature].
 //! ```
 //! # #[cfg(feature="picnic")] {
-//! use picnic_bindings::{PicnicL1FSSigningKey, signature::Signer, RawVerifier};
+//! use picnic_bindings::{PicnicL1FSSigningKey, Signer, RawVerifier};
 //!
 //! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
 //! let msg = "some message".as_bytes();
@@ -88,7 +88,7 @@ use std::fmt::{self, Debug};
 use core::marker::PhantomData;
 use paste::paste;
 use picnic_sys::*;
-pub use signature::{self, Error};
+pub use signature::{self, Error, Signer, Verifier};
 
 #[cfg(feature = "serialization")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -120,22 +120,10 @@ pub trait Parameters: Clone {
     fn parameter_name() -> &'static str;
 }
 
-/// Extension of the [signature::Signer] trait that allows to retrieve to corresponding verifier
-pub trait Signer<S>: signature::Signer<S>
-where
-    S: signature::Signature,
-{
-    /// The verifier type
-    type Verifier: signature::Verifier<S>;
-
-    /// Return corresponding verifier, i.e. verification key
-    fn verifier(&self) -> Result<Self::Verifier, Error>;
-}
-
 /// Trait that allows to directly verify a signature from a `&[u8]`
 ///
 /// With this trait verifiers are able to verify a signature without first storing it in a
-/// [DynamicSignature] to satisfy the [signature::Verifier] interface.
+/// [DynamicSignature] to satisfy the [Verifier] interface.
 pub trait RawVerifier {
     /// Verify a "raw" signature
     fn verify_raw(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error>;
@@ -264,25 +252,7 @@ where
     }
 }
 
-impl<P, S> Signer<S> for SigningKey<P>
-where
-    P: Parameters,
-    S: signature::Signature,
-    SigningKey<P>: signature::Signer<S>,
-    VerificationKey<P>: signature::Verifier<S>,
-{
-    type Verifier = VerificationKey<P>;
-
-    fn verifier(&self) -> Result<Self::Verifier, Error> {
-        let vk = self.data.public_key()?;
-        Ok(Self::Verifier {
-            data: vk,
-            phantom_data: PhantomData,
-        })
-    }
-}
-
-impl<P> signature::Signer<DynamicSignature> for SigningKey<P>
+impl<P> Signer<DynamicSignature> for SigningKey<P>
 where
     P: Parameters,
 {
@@ -401,7 +371,7 @@ pub struct VerificationKey<P: Parameters> {
     phantom_data: PhantomData<P>,
 }
 
-impl<P> signature::Verifier<DynamicSignature> for VerificationKey<P>
+impl<P> Verifier<DynamicSignature> for VerificationKey<P>
 where
     P: Parameters,
 {
@@ -457,6 +427,20 @@ where
             }),
             false => Err(Self::Error::new()),
         }
+    }
+}
+
+impl<P> TryFrom<&SigningKey<P>> for VerificationKey<P>
+where
+    P: Parameters,
+{
+    type Error = Error;
+
+    fn try_from(sk: &SigningKey<P>) -> Result<Self, Self::Error> {
+        Ok(Self {
+            data: sk.data.public_key()?,
+            phantom_data: PhantomData,
+        })
     }
 }
 
@@ -532,15 +516,6 @@ impl DynamicSigningKey {
 }
 
 impl Signer<DynamicSignature> for DynamicSigningKey {
-    type Verifier = DynamicVerificationKey;
-
-    fn verifier(&self) -> Result<Self::Verifier, Error> {
-        let vk = self.data.public_key()?;
-        Ok(Self::Verifier { data: vk })
-    }
-}
-
-impl signature::Signer<DynamicSignature> for DynamicSigningKey {
     fn try_sign(&self, msg: &[u8]) -> Result<DynamicSignature, Error> {
         let mut signature = vec![0; signature_size(self.param())];
         let length = self.data.try_sign(msg, signature.as_mut_slice())?;
@@ -615,7 +590,7 @@ pub struct DynamicVerificationKey {
     data: PublicKey,
 }
 
-impl signature::Verifier<DynamicSignature> for DynamicVerificationKey {
+impl Verifier<DynamicSignature> for DynamicVerificationKey {
     fn verify(&self, msg: &[u8], signature: &DynamicSignature) -> Result<(), Error> {
         self.verify_raw(msg, &signature.0)
     }
@@ -653,6 +628,16 @@ impl TryFrom<&[u8]> for DynamicVerificationKey {
             true => Ok(DynamicVerificationKey { data: vk }),
             false => Err(Self::Error::new()),
         }
+    }
+}
+
+impl TryFrom<&DynamicSigningKey> for DynamicVerificationKey {
+    type Error = Error;
+
+    fn try_from(sk: &DynamicSigningKey) -> Result<Self, Self::Error> {
+        Ok(Self {
+            data: sk.data.public_key()?,
+        })
     }
 }
 

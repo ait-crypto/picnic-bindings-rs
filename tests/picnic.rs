@@ -1,9 +1,8 @@
 #[generic_tests::define]
 mod tests {
     use picnic_bindings::{
-        signature::{Signer as BaseSigner, Verifier},
         DynamicSignature, DynamicSigningKey, DynamicVerificationKey, Parameters, RawVerifier,
-        Signer, SigningKey, VerificationKey,
+        Signer, SigningKey, VerificationKey, Verifier,
     };
 
     const TEST_MESSAGE: &[u8] = "test message".as_bytes();
@@ -32,13 +31,13 @@ mod tests {
     #[test]
     fn vk_match<P: Parameters>() {
         let (sk, vk) = SigningKey::<P>::random().unwrap();
-        assert_eq!(vk, sk.verifier().unwrap());
+        assert_eq!(vk, (&sk).try_into().unwrap());
     }
 
     #[test]
     fn dynamic_vk_match<P: Parameters>() {
         let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
-        assert_eq!(vk, sk.verifier().unwrap());
+        assert_eq!(vk, (&sk).try_into().unwrap());
     }
 
     #[test]
