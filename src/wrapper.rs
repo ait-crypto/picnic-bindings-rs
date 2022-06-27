@@ -200,10 +200,11 @@ mod test {
 
         #[test]
         fn sign_and_verify() {
-            let (sk, pk) = PrivateKey::random(picnic_params_t::Picnic_L1_FS).unwrap();
+            let (sk, pk) =
+                PrivateKey::random(picnic_params_t::Picnic_L1_FS).expect("key gen success");
             let msg = "test message".as_bytes();
             let mut signature = [0u8; PICNIC_SIGNATURE_SIZE_Picnic_L1_FS];
-            let length = sk.try_sign(msg, &mut signature).unwrap();
+            let length = sk.try_sign(msg, &mut signature).expect("signing success");
             assert!(pk.verify(msg, &signature[0..length]).is_ok());
         }
     }
