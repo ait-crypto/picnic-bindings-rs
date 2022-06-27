@@ -30,49 +30,56 @@ mod tests {
 
     #[test]
     fn vk_match<P: Parameters>() {
-        let (sk, vk) = SigningKey::<P>::random().unwrap();
-        assert_eq!(vk, (&sk).try_into().unwrap());
+        let (sk, vk) = SigningKey::<P>::random().expect("keygen success");
+        assert_eq!(vk, (&sk).try_into().expect("sk convertible to vk"));
     }
 
     #[test]
     fn dynamic_vk_match<P: Parameters>() {
-        let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
-        assert_eq!(vk, (&sk).try_into().unwrap());
+        let (sk, vk) = DynamicSigningKey::random(P::PARAM).expect("keygen success");
+        assert_eq!(vk, (&sk).try_into().expect("sk convertible to vk"));
     }
 
     #[test]
     fn sign_and_verify<P: Parameters>() {
-        let (sk, vk) = SigningKey::<P>::random().unwrap();
-        let signature = sk.sign(TEST_MESSAGE);
-        vk.verify(TEST_MESSAGE, &signature).unwrap();
-        vk.verify_raw(TEST_MESSAGE, signature.as_ref()).unwrap();
-        sk.verify(TEST_MESSAGE, &signature).unwrap();
+        let (sk, vk) = SigningKey::<P>::random().expect("keygen success");
+        let signature: DynamicSignature = sk.sign(TEST_MESSAGE);
+        vk.verify(TEST_MESSAGE, &signature)
+            .expect("signatures verifies");
+        vk.verify_raw(TEST_MESSAGE, signature.as_ref())
+            .expect("signature verifies as &[u8]");
+        sk.verify(TEST_MESSAGE, &signature)
+            .expect("signature verifies with sk");
     }
 
     #[test]
     fn dynamic_sign_and_verify<P: Parameters>() {
-        let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
-        let signature = sk.sign(TEST_MESSAGE);
-        vk.verify(TEST_MESSAGE, &signature).unwrap();
-        vk.verify_raw(TEST_MESSAGE, signature.as_ref()).unwrap();
-        sk.verify(TEST_MESSAGE, &signature).unwrap();
+        let (sk, vk) = DynamicSigningKey::random(P::PARAM).expect("keygen success");
+        let signature: DynamicSignature = sk.sign(TEST_MESSAGE);
+        vk.verify(TEST_MESSAGE, &signature)
+            .expect("signatures verifies");
+        vk.verify_raw(TEST_MESSAGE, signature.as_ref())
+            .expect("signature verifies as &[u8]");
+        sk.verify(TEST_MESSAGE, &signature)
+            .expect("signature verifies with sk");
     }
 
     #[test]
     fn serialize_signature<P: Parameters>() {
-        let (sk, vk) = SigningKey::<P>::random().unwrap();
-        let signature = sk.sign(TEST_MESSAGE);
+        let (sk, vk) = SigningKey::<P>::random().expect("keygen success");
+        let signature: DynamicSignature = sk.sign(TEST_MESSAGE);
         let signature2 = DynamicSignature::from(signature.as_ref());
         assert_eq!(signature, signature2);
-        vk.verify(TEST_MESSAGE, &signature2).unwrap();
+        vk.verify(TEST_MESSAGE, &signature2)
+            .expect("signature verifies");
     }
 
     #[test]
     fn serialize_keys<P: Parameters>() {
-        let (sk, vk) = SigningKey::<P>::random().unwrap();
+        let (sk, vk) = SigningKey::<P>::random().expect("keygen success");
 
-        let sk2 = SigningKey::<P>::try_from(sk.as_ref()).unwrap();
-        let vk2 = VerificationKey::<P>::try_from(vk.as_ref()).unwrap();
+        let sk2 = SigningKey::<P>::try_from(sk.as_ref()).expect("sk -> [u8] -> sk");
+        let vk2 = VerificationKey::<P>::try_from(vk.as_ref()).expect("vk -> [u8] -> vk");
 
         assert_eq!(sk, sk2);
         assert_eq!(vk, vk2)
@@ -80,10 +87,10 @@ mod tests {
 
     #[test]
     fn dynamic_serialize_keys<P: Parameters>() {
-        let (sk, vk) = DynamicSigningKey::random(P::PARAM).unwrap();
+        let (sk, vk) = DynamicSigningKey::random(P::PARAM).expect("keygen success");
 
-        let sk2 = DynamicSigningKey::try_from(sk.as_ref()).unwrap();
-        let vk2 = DynamicVerificationKey::try_from(vk.as_ref()).unwrap();
+        let sk2 = DynamicSigningKey::try_from(sk.as_ref()).expect("sk -> [u8] -> sk");
+        let vk2 = DynamicVerificationKey::try_from(vk.as_ref()).expect("vk -> [u8] -> vk");
 
         assert_eq!(sk, sk2);
         assert_eq!(vk, vk2)
@@ -91,22 +98,24 @@ mod tests {
 
     #[test]
     fn serialize_keys_dynamic_and_back<P: Parameters>() {
-        let (sk1, vk1) = SigningKey::<P>::random().unwrap();
+        let (sk1, vk1) = SigningKey::<P>::random().expect("keygen success");
 
-        let sk2 = DynamicSigningKey::try_from(sk1.as_ref()).unwrap();
-        let vk2 = DynamicVerificationKey::try_from(vk1.as_ref()).unwrap();
+        let sk2 = DynamicSigningKey::try_from(sk1.as_ref()).expect("sk -> [u8] -> sk");
+        let vk2 = DynamicVerificationKey::try_from(vk1.as_ref()).expect("vk -> [u8] -> vk");
 
-        let sk3 = SigningKey::<P>::try_from(sk2.as_ref()).unwrap();
-        let vk3 = VerificationKey::<P>::try_from(vk2.as_ref()).unwrap();
+        let sk3 = SigningKey::<P>::try_from(sk2.as_ref()).expect("sk -> [u8] -> sk");
+        let vk3 = VerificationKey::<P>::try_from(vk2.as_ref()).expect("vk -> [u8] -> vk");
 
         assert_eq!(sk1, sk3);
         assert_eq!(vk1, vk3);
 
-        let signature1 = sk1.sign(TEST_MESSAGE);
-        let signature2 = sk2.sign(TEST_MESSAGE);
+        let signature1: DynamicSignature = sk1.sign(TEST_MESSAGE);
+        let signature2: DynamicSignature = sk2.sign(TEST_MESSAGE);
 
-        vk1.verify(TEST_MESSAGE, &signature2).unwrap();
-        vk2.verify(TEST_MESSAGE, &signature1).unwrap();
+        vk1.verify(TEST_MESSAGE, &signature2)
+            .expect("signature2 verifies under vk1");
+        vk2.verify(TEST_MESSAGE, &signature1)
+            .expect("signature1 verifies under vk2");
     }
 
     #[cfg(feature = "subtle")]
@@ -114,8 +123,8 @@ mod tests {
     fn subtle_eq<P: Parameters>() {
         use subtle::ConstantTimeEq;
 
-        let (sk1, _vk1) = SigningKey::<P>::random().unwrap();
-        let (sk2, _vk2) = SigningKey::<P>::random().unwrap();
+        let (sk1, _vk1) = SigningKey::<P>::random().expect("keygen success");
+        let (sk2, _vk2) = SigningKey::<P>::random().expect("keygen success");
         let sk3 = sk1.clone();
 
         assert!(bool::from(sk1.ct_eq(&sk1)));
@@ -237,15 +246,15 @@ mod tests {
         let mut ser = serde_json::Serializer::new(&mut out);
         let ser = serde_bytes_repr::ByteFmtSerializer::hex(&mut ser);
 
-        let (sk1, vk1) = SigningKey::<P>::random().unwrap();
+        let (sk1, vk1) = SigningKey::<P>::random().expect("keygen success");
         let kp1 = KeyPair { sk: sk1, vk: vk1 };
-        kp1.serialize(ser).unwrap();
-        let serialized = String::from_utf8(out).unwrap();
+        kp1.serialize(ser).expect("serialize key pair");
+        let serialized = String::from_utf8(out).expect("serialize to string");
 
         let mut json_de = serde_json::Deserializer::from_str(&serialized);
         let bytefmt_json_de = serde_bytes_repr::ByteFmtDeserializer::new_hex(&mut json_de);
 
-        let kp2 = KeyPair::deserialize(bytefmt_json_de).unwrap();
+        let kp2 = KeyPair::deserialize(bytefmt_json_de).expect("deserialize key pair");
         assert_eq!(kp1.sk, kp2.sk);
         assert_eq!(kp1.vk, kp2.vk);
     }
@@ -257,15 +266,15 @@ mod tests {
         let mut ser = serde_json::Serializer::new(&mut out);
         let ser = serde_bytes_repr::ByteFmtSerializer::hex(&mut ser);
 
-        let (sk1, vk1) = DynamicSigningKey::random(P::PARAM).unwrap();
+        let (sk1, vk1) = DynamicSigningKey::random(P::PARAM).expect("keygen success");
         let kp1 = DynamicKeyPair { sk: sk1, vk: vk1 };
-        kp1.serialize(ser).unwrap();
-        let serialized = String::from_utf8(out).unwrap();
+        kp1.serialize(ser).expect("serialize key pair");
+        let serialized = String::from_utf8(out).expect("serialize to string");
 
         let mut json_de = serde_json::Deserializer::from_str(&serialized);
         let bytefmt_json_de = serde_bytes_repr::ByteFmtDeserializer::new_hex(&mut json_de);
 
-        let kp2 = DynamicKeyPair::deserialize(bytefmt_json_de).unwrap();
+        let kp2 = DynamicKeyPair::deserialize(bytefmt_json_de).expect("deserialize key pair");
         assert_eq!(kp1, kp2);
     }
 
