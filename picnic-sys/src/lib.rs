@@ -158,6 +158,7 @@ mod tests {
             assert!(picnic_get_private_key_size(params) > 0);
             let pk_size = picnic_get_public_key_size(params);
             assert!(pk_size > 0);
+            assert!(pk_size <= PICNIC_MAX_PUBLICKEY_SIZE);
 
             let mut sk = picnic_privatekey_t {
                 data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
@@ -192,6 +193,13 @@ mod tests {
             );
             assert!(length > 0);
             assert!(length <= max_length);
+            if params == picnic_params_t::Picnic_L1_UR
+                || params == picnic_params_t::Picnic_L3_UR
+                || params == picnic_params_t::Picnic_L5_UR
+            {
+                assert!(length == max_length);
+            }
+            signature.resize(length, 0);
             assert_eq!(
                 picnic_verify(&pk, msg.as_ptr(), msg.len(), signature.as_ptr(), length),
                 0
