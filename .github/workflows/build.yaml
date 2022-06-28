@@ -41,6 +41,7 @@ jobs:
           args: --all-features
 
   test-static:
+    needs: [test-shared, clippy, fmt]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -75,6 +76,7 @@ jobs:
           args: --all-features
 
   build-cross:
+    needs: test-static
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
