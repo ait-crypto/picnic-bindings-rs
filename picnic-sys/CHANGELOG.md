@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.15 (2022-06-29)
+
+* Bump Picnic to 3.0.15.
+* Add more tests.
+* Enable stack protector.
+
 ## 3.0.14 (2022-04-15)
 
 * Disable use of `__builtin_cpu_supports`. When cross compiling, the toolchain does not seem to link the necessary libraries.
