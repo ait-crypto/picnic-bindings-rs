@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.16 (2022-08-02)
+
+* Bump Picnic to 3.0.16.
+
 ## 3.0.15 (2022-06-29)
 
 * Bump Picnic to 3.0.15.
