@@ -145,6 +145,7 @@ macro_rules! define_params {
                 const PRIVATE_KEY_SIZE: usize = [<PICNIC_PRIVATE_KEY_SIZE_ $param>];
                 const PUBLIC_KEY_SIZE: usize = [<PICNIC_PUBLIC_KEY_SIZE_ $param>];
 
+                #[inline(always)]
                 fn parameter_name() -> &'static str {
                     "$param"
                 }
@@ -280,10 +281,12 @@ impl<P> PicnicKey for SigningKey<P>
 where
     P: Parameters,
 {
+    #[inline(always)]
     fn param(&self) -> picnic_params_t {
         P::PARAM
     }
 
+    #[inline(always)]
     fn serialized_size(&self) -> usize {
         P::PRIVATE_KEY_SIZE
     }
@@ -404,10 +407,12 @@ impl<P> PicnicKey for VerificationKey<P>
 where
     P: Parameters,
 {
+    #[inline(always)]
     fn param(&self) -> picnic_params_t {
         P::PARAM
     }
 
+    #[inline(always)]
     fn serialized_size(&self) -> usize {
         P::PUBLIC_KEY_SIZE
     }
@@ -544,10 +549,12 @@ impl Verifier<DynamicSignature> for DynamicSigningKey {
 }
 
 impl PicnicKey for DynamicSigningKey {
+    #[inline(always)]
     fn param(&self) -> picnic_params_t {
         self.data.param()
     }
 
+    #[inline(always)]
     fn serialized_size(&self) -> usize {
         self.data.serialized_size()
     }
@@ -622,10 +629,12 @@ impl RawVerifier for DynamicVerificationKey {
 }
 
 impl PicnicKey for DynamicVerificationKey {
+    #[inline(always)]
     fn param(&self) -> picnic_params_t {
         self.data.param()
     }
 
+    #[inline(always)]
     fn serialized_size(&self) -> usize {
         self.data.serialized_size()
     }

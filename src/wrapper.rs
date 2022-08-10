@@ -5,6 +5,7 @@ use picnic_sys::*;
 use signature::Error;
 
 /// Obtain max signature size for a parameter set `param`
+#[inline(always)]
 pub(crate) fn signature_size(param: picnic_params_t) -> usize {
     unsafe { picnic_signature_size(param) }
 }
@@ -62,6 +63,7 @@ impl PrivateKey {
 }
 
 impl Default for PrivateKey {
+    #[inline(always)]
     fn default() -> Self {
         Self(picnic_privatekey_t {
             data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
@@ -70,6 +72,7 @@ impl Default for PrivateKey {
 }
 
 impl Drop for PrivateKey {
+    #[inline(always)]
     fn drop(&mut self) {
         unsafe {
             picnic_clear_private_key(self.as_mut());
@@ -78,12 +81,14 @@ impl Drop for PrivateKey {
 }
 
 impl AsMut<picnic_privatekey_t> for PrivateKey {
+    #[inline(always)]
     fn as_mut(&mut self) -> &mut picnic_privatekey_t {
         &mut self.0
     }
 }
 
 impl AsRef<picnic_privatekey_t> for PrivateKey {
+    #[inline(always)]
     fn as_ref(&self) -> &picnic_privatekey_t {
         &self.0
     }
@@ -102,10 +107,12 @@ impl TryFrom<&[u8]> for PrivateKey {
 }
 
 impl PicnicKey for PrivateKey {
+    #[inline(always)]
     fn param(&self) -> picnic_params_t {
         unsafe { picnic_get_private_key_param(self.as_ref()) }
     }
 
+    #[inline(always)]
     fn serialized_size(&self) -> usize {
         unsafe { picnic_get_private_key_size(self.param()) }
     }
@@ -134,6 +141,7 @@ impl PublicKey {
 }
 
 impl Default for PublicKey {
+    #[inline(always)]
     fn default() -> Self {
         Self(picnic_publickey_t {
             data: [0; PICNIC_MAX_PUBLICKEY_SIZE],
@@ -142,12 +150,14 @@ impl Default for PublicKey {
 }
 
 impl AsMut<picnic_publickey_t> for PublicKey {
+    #[inline(always)]
     fn as_mut(&mut self) -> &mut picnic_publickey_t {
         &mut self.0
     }
 }
 
 impl AsRef<picnic_publickey_t> for PublicKey {
+    #[inline(always)]
     fn as_ref(&self) -> &picnic_publickey_t {
         &self.0
     }
@@ -166,10 +176,12 @@ impl TryFrom<&[u8]> for PublicKey {
 }
 
 impl PicnicKey for PublicKey {
+    #[inline(always)]
     fn param(&self) -> picnic_params_t {
         unsafe { picnic_get_public_key_param(self.as_ref()) }
     }
 
+    #[inline(always)]
     fn serialized_size(&self) -> usize {
         unsafe { picnic_get_public_key_size(self.param()) }
     }
