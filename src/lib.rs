@@ -125,7 +125,7 @@ pub trait Parameters: Clone {
 /// With this trait verifiers are able to verify a signature without first storing it in a
 /// [DynamicSignature] to satisfy the [Verifier] interface.
 pub trait RawVerifier {
-    /// Verify a "raw" signature
+    /// Verify a "raw" signature.
     fn verify_raw(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error>;
 }
 
@@ -237,7 +237,9 @@ impl<P> SigningKey<P>
 where
     P: Parameters,
 {
-    /// Sample a new random signing key and the corresponding verification key
+    /// Sample a new random signing key and the corresponding verification key.
+    /// This operation may fail if the Picnic library is not built with support
+    /// for the given parameter set.
     pub fn random() -> Result<(Self, VerificationKey<P>), Error> {
         let (sk, vk) = PrivateKey::random(P::PARAM)?;
         Ok((
@@ -524,7 +526,9 @@ impl Debug for DynamicSigningKey {
 }
 
 impl DynamicSigningKey {
-    /// Sample a new random signing key and the corresponding verification key
+    /// Sample a new random signing key and the corresponding verification key.
+    /// This operation may fail if the Picnic library is not built with support
+    /// for the given parameter set.
     pub fn random(params: picnic_params_t) -> Result<(Self, DynamicVerificationKey), Error> {
         let (sk, vk) = PrivateKey::random(params)?;
         Ok((Self { data: sk }, DynamicVerificationKey { data: vk }))

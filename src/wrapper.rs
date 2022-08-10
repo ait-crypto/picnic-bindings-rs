@@ -1,10 +1,10 @@
-//! This module provides a very thin wrapper and contains all the unsafe calls to the picnic
-//! implementation.
+//! This module provides a very thin wrappers and contains all the unsafe calls
+//! to the Picnic implementation.
 
 use picnic_sys::*;
 use signature::Error;
 
-/// Obtain max signature size for a parameter set `param`
+/// Obtain max signature size for a parameter set `param`.
 #[inline(always)]
 pub(crate) fn signature_size(param: picnic_params_t) -> usize {
     unsafe { picnic_signature_size(param) }
@@ -24,7 +24,8 @@ pub(crate) trait PicnicKey {
 pub(crate) struct PrivateKey(picnic_privatekey_t);
 
 impl PrivateKey {
-    /// Sample a fresh key pair
+    /// Sample a fresh key pair. Key generation may fail if the linked Picnic
+    /// implementation does not support the given parameter set.
     pub(crate) fn random(param: picnic_params_t) -> Result<(PrivateKey, PublicKey), Error> {
         let mut sk = PrivateKey::default();
         let mut vk = PublicKey::default();
@@ -35,7 +36,8 @@ impl PrivateKey {
         }
     }
 
-    /// Try to sign a message. The provided signature buffer needs to large enough to hold the signature.
+    /// Try to sign a message. The provided signature buffer needs to be large
+    /// enough to hold the signature.
     pub(crate) fn try_sign(&self, msg: &[u8], signature: &mut [u8]) -> Result<size_t, Error> {
         let mut length: size_t = signature.len();
         match unsafe {
@@ -123,7 +125,7 @@ impl PicnicKey for PrivateKey {
 pub(crate) struct PublicKey(picnic_publickey_t);
 
 impl PublicKey {
-    /// Verify the signature on a message
+    /// Verify the signature on a message.
     pub(crate) fn verify(&self, msg: &[u8], signature: &[u8]) -> Result<(), Error> {
         match unsafe {
             picnic_verify(
