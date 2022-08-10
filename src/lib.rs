@@ -241,17 +241,18 @@ where
     /// This operation may fail if the Picnic library is not built with support
     /// for the given parameter set.
     pub fn random() -> Result<(Self, VerificationKey<P>), Error> {
-        let (sk, vk) = PrivateKey::random(P::PARAM)?;
-        Ok((
-            Self {
-                data: sk,
-                phantom_data: PhantomData,
-            },
-            VerificationKey {
-                data: vk,
-                phantom_data: PhantomData,
-            },
-        ))
+        PrivateKey::random(P::PARAM).map(|(sk, vk)| {
+            (
+                Self {
+                    data: sk,
+                    phantom_data: PhantomData,
+                },
+                VerificationKey {
+                    data: vk,
+                    phantom_data: PhantomData,
+                },
+            )
+        })
     }
 }
 
@@ -455,8 +456,8 @@ where
     type Error = Error;
 
     fn try_from(sk: &SigningKey<P>) -> Result<Self, Self::Error> {
-        Ok(Self {
-            data: sk.data.public_key()?,
+        sk.data.public_key().map(|vk| Self {
+            data: vk,
             phantom_data: PhantomData,
         })
     }
@@ -530,8 +531,8 @@ impl DynamicSigningKey {
     /// This operation may fail if the Picnic library is not built with support
     /// for the given parameter set.
     pub fn random(params: picnic_params_t) -> Result<(Self, DynamicVerificationKey), Error> {
-        let (sk, vk) = PrivateKey::random(params)?;
-        Ok((Self { data: sk }, DynamicVerificationKey { data: vk }))
+        PrivateKey::random(params)
+            .map(|(sk, vk)| (Self { data: sk }, DynamicVerificationKey { data: vk }))
     }
 }
 
@@ -667,9 +668,7 @@ impl TryFrom<&DynamicSigningKey> for DynamicVerificationKey {
     type Error = Error;
 
     fn try_from(sk: &DynamicSigningKey) -> Result<Self, Self::Error> {
-        Ok(Self {
-            data: sk.data.public_key()?,
-        })
+        sk.data.public_key().map(|vk| Self { data: vk })
     }
 }
 
