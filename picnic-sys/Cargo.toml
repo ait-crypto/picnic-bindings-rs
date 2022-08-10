@@ -19,7 +19,7 @@ pkg-config = { version = "0.3", optional = true }
 cc = { version = "1", optional = true, features = ["parallel"] }
 
 [dev-dependencies]
-hex = "0.4"
+hex = { version = "0.4", default-features = false, features = ["alloc"] }
 
 [features]
 default = ["system", "static-fallback", "picnic", "picnic3"]
