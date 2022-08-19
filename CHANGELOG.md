@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5 (2022-08-19)
+
+* Never print private keys.
+* Remove `Signer` trait.
+* Implement `Verifier` trait for private keys.
+
 ## 0.4.2 (2022-04-05)
 
 * Extend the documentation with an example for `RawVerifier`.
