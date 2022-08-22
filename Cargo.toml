@@ -7,7 +7,7 @@ homepage = "https://microsoft.github.io/Picnic/"
 repository = "https://github.com/ait-crypto/picnic-bindings-rs"
 license = "MIT"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.60"
 keywords = ["signatures", "Picnic"]
 categories = ["cryptography", "api-bindings", "no-std"]
 
@@ -39,7 +39,7 @@ unruh-transform = ["picnic-sys/unruh-transform"]
 system = ["picnic-sys/system"]
 static-fallback = ["picnic-sys/static-fallback"]
 std = ["signature/std"]
-serialization = ["serde", "serde_bytes"]
+serialization = ["dep:serde", "dep:serde_bytes"]
 
 [package.metadata.docs.rs]
 all-features = true

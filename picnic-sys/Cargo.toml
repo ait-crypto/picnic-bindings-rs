@@ -7,7 +7,7 @@ homepage = "https://microsoft.github.io/Picnic/"
 repository = "https://github.com/ait-crypto/picnic-bindings-rs"
 license = "MIT"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.60"
 links = "picnic"
 categories = ["external-ffi-bindings"]
 
@@ -26,5 +26,5 @@ default = ["system", "static-fallback", "picnic", "picnic3"]
 picnic = []
 picnic3 = []
 unruh-transform = ["picnic"]
-system = ["pkg-config"]
-static-fallback = ["cc"]
+system = ["dep:pkg-config"]
+static-fallback = ["dep:cc"]
