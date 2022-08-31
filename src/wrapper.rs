@@ -73,6 +73,27 @@ impl Default for PrivateKey {
     }
 }
 
+#[cfg(feature = "zeroize")]
+impl zeroize::Zeroize for PrivateKey {
+    #[inline(always)]
+    fn zeroize(&mut self) {
+        self.0.data.zeroize()
+    }
+}
+
+#[cfg(feature = "zeroize")]
+impl zeroize::ZeroizeOnDrop for PrivateKey {}
+
+#[cfg(feature = "zeroize")]
+impl Drop for PrivateKey {
+    #[inline(always)]
+    fn drop(&mut self) {
+        use zeroize::Zeroize;
+        self.zeroize()
+    }
+}
+
+#[cfg(not(feature = "zeroize"))]
 impl Drop for PrivateKey {
     #[inline(always)]
     fn drop(&mut self) {

@@ -228,8 +228,10 @@ impl signature::Signature for DynamicSignature {
 
 /// Signing key generic over the parameters
 #[derive(Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct SigningKey<P: Parameters> {
     data: PrivateKey,
+    #[cfg_attr(feature = "zeroize", zeroize(skip))]
     phantom_data: PhantomData<P>,
 }
 
@@ -513,6 +515,7 @@ where
 
 /// Signing key
 #[derive(Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct DynamicSigningKey {
     data: PrivateKey,
 }
