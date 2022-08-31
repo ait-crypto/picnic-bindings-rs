@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 (2022-08-31)
+
+* Add optional dependency in `zeroize` and implement `Zeroize` and `ZeroizeOnDrop` for private keys.
+* Remove implicit features from optional dependencies.
+* Require Rust 1.60.
+
 ## 0.5 (2022-08-19)
 
 * Never print private keys.
