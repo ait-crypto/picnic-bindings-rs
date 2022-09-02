@@ -163,7 +163,7 @@ macro_rules! define_types_and_functions {
             #[repr(C)]
             #[derive(Debug, Clone)]
             pub struct [<$param:lower _privatekey_t>] {
-                pub data: [u8; [<PICNIC_PUBLIC_KEY_SIZE_ $param>] - 1],
+                pub data: [u8; [<PICNIC_PRIVATE_KEY_SIZE_ $param>] - 1],
             }
 
             extern "system" {
@@ -182,7 +182,7 @@ macro_rules! define_types_and_functions {
                     signature_len: *mut size_t,
                 ) -> c_int;
                 pub fn [<$param:lower _signature_size>]() -> size_t;
-                pub fn [<$param:lower _fs_verify>](
+                pub fn [<$param:lower _verify>](
                     pk: *const [<$param:lower _publickey_t>],
                     message: *const u8,
                     message_len: size_t,
@@ -214,7 +214,7 @@ macro_rules! define_types_and_functions {
                     publickey: *const [<$param:lower _publickey_t>],
                 ) -> c_int;
                 pub fn [<$param:lower _clear_private_key>](key: *mut [<$param:lower _privatekey_t>]);
-                pub fn [<$param:lower  l1_fs_sk_to_pk>](
+                pub fn [<$param:lower _sk_to_pk>](
                     privatekey: *const [<$param:lower _privatekey_t>],
                     publickey: *mut [<$param:lower _publickey_t>],
                 ) -> c_int;
