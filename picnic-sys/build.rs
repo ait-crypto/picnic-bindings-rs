@@ -25,6 +25,7 @@ fn build() {
         // 32 bit ARM is in general unhappy with unaligned access
         build.define("NO_MISALIGNED_ACCESSES", None);
     }
+    build.include(src);
     build.include(src.join("sha3"));
     if pointer_width == 32 {
         build.include(src.join("sha3/plain32"));
@@ -94,6 +95,12 @@ fn build() {
                 "lowmc_192_192_4.c",
                 "lowmc_255_255_4.c",
                 "lowmc_256_256_38.c",
+                "picnic_L1_FS/picnic_l1_fs.c",
+                "picnic_L3_FS/picnic_l3_fs.c",
+                "picnic_L5_FS/picnic_l5_fs.c",
+                "picnic_L1_full/picnic_l1_full.c",
+                "picnic_L3_full/picnic_l3_full.c",
+                "picnic_L5_full/picnic_l5_full.c",
             ]
             .iter(),
         );
@@ -104,8 +111,17 @@ fn build() {
         build.define("WITH_LOWMC_129_129_4", None);
         build.define("WITH_LOWMC_192_192_4", None);
         build.define("WITH_LOWMC_255_255_4", None);
-        #[cfg(feature = "unruh-transform")]
-        build.define("WITH_UNRUH", None);
+        if cfg!(feature = "unruh-transform") {
+            build.define("WITH_UNRUH", None);
+            files.extend(
+                [
+                    "picnic_L1_UR/picnic_l1_ur.c",
+                    "picnic_L3_UR/picnic_l3_ur.c",
+                    "picnic_L5_UR/picnic_l5_ur.c",
+                ]
+                .iter(),
+            );
+        }
     }
 
     if cfg!(feature = "picnic3") {
@@ -118,6 +134,9 @@ fn build() {
                 "lowmc_192_192_4.c",
                 "lowmc_255_255_4.c",
                 "lowmc_256_256_38.c",
+                "picnic3_L1/picnic3_l1.c",
+                "picnic3_L3/picnic3_l3.c",
+                "picnic3_L5/picnic3_l5.c",
             ]
             .iter(),
         );
