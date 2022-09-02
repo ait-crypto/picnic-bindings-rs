@@ -9,6 +9,7 @@
 #![allow(non_upper_case_globals, non_camel_case_types)]
 
 pub use libc::{c_char, c_int, size_t};
+use paste::paste;
 
 pub const LOWMC_BLOCK_SIZE_Picnic_L1_FS: usize = 16;
 pub const LOWMC_BLOCK_SIZE_Picnic_L1_UR: usize = 16;
@@ -148,6 +149,104 @@ extern "system" {
     pub fn picnic_get_private_key_param(privatekey: *const picnic_privatekey_t) -> picnic_params_t;
     pub fn picnic_get_public_key_param(publickey: *const picnic_publickey_t) -> picnic_params_t;
 }
+
+/// Define a parameters set and its associated implementations and types
+macro_rules! define_types_and_functions {
+    ($param:ident) => {
+        paste! {
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone)]
+            pub struct [<$param:lower _publickey_t>] {
+                pub data: [u8; [<PICNIC_PUBLIC_KEY_SIZE_ $param>] - 1],
+            }
+
+            #[repr(C)]
+            #[derive(Debug, Clone)]
+            pub struct [<$param:lower _privatekey_t>] {
+                pub data: [u8; [<PICNIC_PUBLIC_KEY_SIZE_ $param>] - 1],
+            }
+
+            extern "system" {
+                pub fn [<$param:lower _get_param_name>]() -> *const c_char;
+                pub fn [<$param:lower _get_private_key_size>]() -> size_t;
+                pub fn [<$param:lower _get_public_key_size>]() -> size_t;
+                pub fn [<$param:lower _keygen>](
+                    pk: *mut [<$param:lower _publickey_t>],
+                    sk: *mut [<$param:lower _privatekey_t>],
+                ) -> c_int;
+                pub fn [<$param:lower _sign>](
+                    sk: *const [<$param:lower _privatekey_t>],
+                    message: *const u8,
+                    message_len: size_t,
+                    signature: *mut u8,
+                    signature_len: *mut size_t,
+                ) -> c_int;
+                pub fn [<$param:lower _signature_size>]() -> size_t;
+                pub fn [<$param:lower _fs_verify>](
+                    pk: *const [<$param:lower _publickey_t>],
+                    message: *const u8,
+                    message_len: size_t,
+                    signature: *const u8,
+                    signature_len: size_t,
+                ) -> c_int;
+                pub fn [<$param:lower _write_public_key>](
+                    key: *const [<$param:lower _publickey_t>],
+                    buf: *mut u8,
+                    buflen: size_t,
+                ) -> c_int;
+                pub fn [<$param:lower _read_public_key>](
+                    key: *mut [<$param:lower _publickey_t>],
+                    buf: *const u8,
+                    buflen: size_t,
+                ) -> c_int;
+                pub fn [<$param:lower _write_private_key>](
+                    key: *const [<$param:lower _privatekey_t>],
+                    buf: *mut u8,
+                    buflen: size_t,
+                ) -> c_int;
+                pub fn [<$param:lower _read_private_key>](
+                    key: *mut [<$param:lower _privatekey_t>],
+                    buf: *const u8,
+                    buflen: size_t,
+                ) -> c_int;
+                pub fn [<$param:lower _validate_keypair>](
+                    privatekey: *const [<$param:lower _privatekey_t>],
+                    publickey: *const [<$param:lower _publickey_t>],
+                ) -> c_int;
+                pub fn [<$param:lower _clear_private_key>](key: *mut [<$param:lower _privatekey_t>]);
+                pub fn [<$param:lower  l1_fs_sk_to_pk>](
+                    privatekey: *const [<$param:lower _privatekey_t>],
+                    publickey: *mut [<$param:lower _publickey_t>],
+                ) -> c_int;
+            }
+        }
+    };
+}
+
+#[cfg(feature = "picnic")]
+define_types_and_functions!(Picnic_L1_FS);
+#[cfg(feature = "picnic")]
+define_types_and_functions!(Picnic_L3_FS);
+#[cfg(feature = "picnic")]
+define_types_and_functions!(Picnic_L5_FS);
+#[cfg(feature = "picnic")]
+define_types_and_functions!(Picnic_L1_full);
+#[cfg(feature = "picnic")]
+define_types_and_functions!(Picnic_L3_full);
+#[cfg(feature = "picnic")]
+define_types_and_functions!(Picnic_L5_full);
+#[cfg(all(feature = "picnic", feature = "unruh-transform"))]
+define_types_and_functions!(Picnic_L1_UR);
+#[cfg(all(feature = "picnic", feature = "unruh-transform"))]
+define_types_and_functions!(Picnic_L3_UR);
+#[cfg(all(feature = "picnic", feature = "unruh-transform"))]
+define_types_and_functions!(Picnic_L5_UR);
+#[cfg(feature = "picnic3")]
+define_types_and_functions!(Picnic3_L1);
+#[cfg(feature = "picnic3")]
+define_types_and_functions!(Picnic3_L3);
+#[cfg(feature = "picnic3")]
+define_types_and_functions!(Picnic3_L5);
 
 #[cfg(test)]
 mod tests {

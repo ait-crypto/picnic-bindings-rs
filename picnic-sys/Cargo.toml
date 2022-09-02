@@ -13,6 +13,7 @@ categories = ["external-ffi-bindings"]
 
 [dependencies]
 libc = { version = "0.2", default-features = false }
+paste = "1"
 
 [build-dependencies]
 pkg-config = { version = "0.3", optional = true }

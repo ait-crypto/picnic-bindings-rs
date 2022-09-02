@@ -159,7 +159,7 @@ fn main() {
     #[cfg(feature = "system")]
     // Try to find shared library via pkg-config
     if pkg_config::Config::new()
-        .range_version("3.0.5".."4.0")
+        .range_version("3.0.18".."4.0")
         .probe("picnic")
         .is_ok()
     {
