@@ -89,6 +89,7 @@ pub struct picnic_publickey_t {
 
 #[repr(C)]
 #[derive(Clone)]
+#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
 pub struct picnic_privatekey_t {
     pub data: [u8; PICNIC_MAX_PRIVATEKEY_SIZE],
 }
@@ -162,6 +163,7 @@ macro_rules! define_types_and_functions {
 
             #[repr(C)]
             #[derive(Debug, Clone)]
+            #[cfg_attr(feature="zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
             pub struct [<$param:lower _privatekey_t>] {
                 pub data: [u8; [<PICNIC_PRIVATE_KEY_SIZE_ $param>] - 1],
             }
