@@ -13,7 +13,7 @@ categories = ["external-ffi-bindings"]
 
 [dependencies]
 libc = { version = "0.2", default-features = false }
-paste = "1"
+paste = { version = "1", optional = true }
 zeroize = { version = "1.5", optional = true, default-features = false, features = [
     "derive",
 ] }
@@ -27,8 +27,15 @@ hex = { version = "0.4", default-features = false, features = ["alloc"] }
 
 [features]
 default = ["system", "static-fallback", "picnic", "picnic3"]
+# Enable Picnic parameter sets
 picnic = []
+# Enable Picnic3 parameter sets
 picnic3 = []
+# Enable Picnic parameter sets with Unruh transform
 unruh-transform = ["picnic"]
+# Look for libpicnic via pkg-config
 system = ["dep:pkg-config"]
+# Build libpicnic if not found
 static-fallback = ["dep:cc"]
+# Add parameter set-specfic mappings
+param-bindings = ["dep:paste"]

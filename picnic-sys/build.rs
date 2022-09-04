@@ -95,15 +95,22 @@ fn build() {
                 "lowmc_192_192_4.c",
                 "lowmc_255_255_4.c",
                 "lowmc_256_256_38.c",
-                "picnic_L1_FS/picnic_l1_fs.c",
-                "picnic_L3_FS/picnic_l3_fs.c",
-                "picnic_L5_FS/picnic_l5_fs.c",
-                "picnic_L1_full/picnic_l1_full.c",
-                "picnic_L3_full/picnic_l3_full.c",
-                "picnic_L5_full/picnic_l5_full.c",
             ]
             .iter(),
         );
+        if cfg!(feature = "param-bindings") {
+            files.extend(
+                [
+                    "picnic_L1_FS/picnic_l1_fs.c",
+                    "picnic_L3_FS/picnic_l3_fs.c",
+                    "picnic_L5_FS/picnic_l5_fs.c",
+                    "picnic_L1_full/picnic_l1_full.c",
+                    "picnic_L3_full/picnic_l3_full.c",
+                    "picnic_L5_full/picnic_l5_full.c",
+                ]
+                .iter(),
+            );
+        }
         build.define("WITH_ZKBPP", None);
         build.define("WITH_LOWMC_128_128_20", None);
         build.define("WITH_LOWMC_192_192_30", None);
@@ -113,14 +120,16 @@ fn build() {
         build.define("WITH_LOWMC_255_255_4", None);
         if cfg!(feature = "unruh-transform") {
             build.define("WITH_UNRUH", None);
-            files.extend(
-                [
-                    "picnic_L1_UR/picnic_l1_ur.c",
-                    "picnic_L3_UR/picnic_l3_ur.c",
-                    "picnic_L5_UR/picnic_l5_ur.c",
-                ]
-                .iter(),
-            );
+            if cfg!(feature = "param-bindings") {
+                files.extend(
+                    [
+                        "picnic_L1_UR/picnic_l1_ur.c",
+                        "picnic_L3_UR/picnic_l3_ur.c",
+                        "picnic_L5_UR/picnic_l5_ur.c",
+                    ]
+                    .iter(),
+                );
+            }
         }
     }
 
@@ -134,12 +143,19 @@ fn build() {
                 "lowmc_192_192_4.c",
                 "lowmc_255_255_4.c",
                 "lowmc_256_256_38.c",
-                "picnic3_L1/picnic3_l1.c",
-                "picnic3_L3/picnic3_l3.c",
-                "picnic3_L5/picnic3_l5.c",
             ]
             .iter(),
         );
+        if cfg!(feature = "param-bindings") {
+            files.extend(
+                [
+                    "picnic3_L1/picnic3_l1.c",
+                    "picnic3_L3/picnic3_l3.c",
+                    "picnic3_L5/picnic3_l5.c",
+                ]
+                .iter(),
+            );
+        }
         build.define("WITH_KKW", None);
         build.define("WITH_LOWMC_129_129_4", None);
         build.define("WITH_LOWMC_192_192_4", None);
@@ -157,13 +173,20 @@ fn build() {
 
 fn main() {
     #[cfg(feature = "system")]
-    // Try to find shared library via pkg-config
-    if pkg_config::Config::new()
-        .range_version("3.0.18".."4.0")
-        .probe("picnic")
-        .is_ok()
     {
-        return;
+        #[cfg(feature = "param-bindings")]
+        let version_range = "3.0.18".."4.0";
+        #[cfg(not(feature = "param-bindings"))]
+        let version_range = "3.0.5".."4.0";
+
+        // Try to find shared library via pkg-config
+        if pkg_config::Config::new()
+            .range_version(version_range)
+            .probe("picnic")
+            .is_ok()
+        {
+            return;
+        }
     }
 
     #[cfg(feature = "static-fallback")]

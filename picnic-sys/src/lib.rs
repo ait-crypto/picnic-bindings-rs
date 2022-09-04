@@ -9,6 +9,7 @@
 #![allow(non_upper_case_globals, non_camel_case_types)]
 
 pub use libc::{c_char, c_int, size_t};
+#[cfg(feature = "param-bindings")]
 use paste::paste;
 #[cfg(feature = "zeroize")]
 use zeroize::{Zeroize, ZeroizeOnDrop};
@@ -153,6 +154,7 @@ extern "system" {
     pub fn picnic_get_public_key_param(publickey: *const picnic_publickey_t) -> picnic_params_t;
 }
 
+#[cfg(feature = "param-bindings")]
 /// Define a parameters set and its associated implementations and types
 macro_rules! define_types_and_functions {
     ($param:ident) => {
@@ -225,6 +227,12 @@ macro_rules! define_types_and_functions {
             }
         }
     };
+}
+
+#[cfg(not(feature = "param-bindings"))]
+/// No-op
+macro_rules! define_types_and_functions {
+    ($param:ident) => {};
 }
 
 #[cfg(feature = "picnic")]
