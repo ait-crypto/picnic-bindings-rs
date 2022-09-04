@@ -10,6 +10,8 @@
 
 pub use libc::{c_char, c_int, size_t};
 use paste::paste;
+#[cfg(feature = "zeroize")]
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 pub const LOWMC_BLOCK_SIZE_Picnic_L1_FS: usize = 16;
 pub const LOWMC_BLOCK_SIZE_Picnic_L1_UR: usize = 16;
@@ -89,7 +91,7 @@ pub struct picnic_publickey_t {
 
 #[repr(C)]
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+#[cfg_attr(feature = "zeroize", derive(Zeroize, ZeroizeOnDrop))]
 pub struct picnic_privatekey_t {
     pub data: [u8; PICNIC_MAX_PRIVATEKEY_SIZE],
 }
@@ -163,7 +165,7 @@ macro_rules! define_types_and_functions {
 
             #[repr(C)]
             #[derive(Clone)]
-            #[cfg_attr(feature="zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+            #[cfg_attr(feature="zeroize", derive(Zeroize, ZeroizeOnDrop))]
             pub struct [<$param:lower _privatekey_t>] {
                 pub data: [u8; [<PICNIC_PRIVATE_KEY_SIZE_ $param>] - 1],
             }
