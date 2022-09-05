@@ -13,6 +13,7 @@ This crate supports the following features:
 * `std` (default): Use `std`.
 * `subtle`: Provide constant-time equality comparison for `SigningKey`.
 * `serialization`: Enable serialization with [serde](https://serde.rs).
+* `zeroize`: Enable zeroziation of private keys via [zeroize](https://crates.io/crates/zeroize).
 
 If the crate is not built with `std` enabled, the `alloc` crates is used.
 
