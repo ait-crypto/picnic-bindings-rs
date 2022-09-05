@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.18 (2022-09-05)
+
+* Add `zeroize` feature to implement `Zeroize` and `ZeroizeOnDrop` for private keys.
+* Add `param-bindings` feature to enable bindings for parameter specific functions introduced in Picnic 3.0.18.
+
 ## 3.0.17 (2022-08-10)
 
 * Bump Picnic to 3.0.17.
