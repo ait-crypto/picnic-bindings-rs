@@ -87,6 +87,9 @@ pub use signature::{self, Error, Signer, Verifier};
 #[cfg(feature = "serialization")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
+#[cfg(feature = "zeroize")]
+use zeroize::{Zeroize, ZeroizeOnDrop};
+
 #[cfg(feature = "subtle")]
 use subtle::{Choice, ConstantTimeEq};
 
@@ -209,7 +212,7 @@ impl signature::Signature for DynamicSignature {
 
 /// Signing key generic over the parameters
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+#[cfg_attr(feature = "zeroize", derive(Zeroize, ZeroizeOnDrop))]
 pub struct SigningKey<P: Parameters> {
     data: PrivateKey,
     #[cfg_attr(feature = "zeroize", zeroize(skip))]
@@ -496,7 +499,7 @@ where
 
 /// Signing key
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(zeroize::Zeroize, zeroize::ZeroizeOnDrop))]
+#[cfg_attr(feature = "zeroize", derive(Zeroize, ZeroizeOnDrop))]
 pub struct DynamicSigningKey {
     data: PrivateKey,
 }

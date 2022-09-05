@@ -4,6 +4,9 @@
 use picnic_sys::*;
 use signature::Error;
 
+#[cfg(feature = "zeroize")]
+use zeroize::{Zeroize, ZeroizeOnDrop};
+
 /// Obtain max signature size for a parameter set `param`.
 #[inline(always)]
 pub(crate) fn signature_size(param: picnic_params_t) -> usize {
@@ -21,6 +24,7 @@ pub(crate) trait PicnicKey {
 
 /// Newtype pattern for `picnic_privatekey_t`
 #[derive(Clone)]
+#[cfg_attr(feature = "zeroize", derive(Zeroize, ZeroizeOnDrop))]
 pub(crate) struct PrivateKey(picnic_privatekey_t);
 
 impl PrivateKey {
@@ -70,26 +74,6 @@ impl Default for PrivateKey {
         Self(picnic_privatekey_t {
             data: [0; PICNIC_MAX_PRIVATEKEY_SIZE],
         })
-    }
-}
-
-#[cfg(feature = "zeroize")]
-impl zeroize::Zeroize for PrivateKey {
-    #[inline(always)]
-    fn zeroize(&mut self) {
-        self.0.data.zeroize()
-    }
-}
-
-#[cfg(feature = "zeroize")]
-impl zeroize::ZeroizeOnDrop for PrivateKey {}
-
-#[cfg(feature = "zeroize")]
-impl Drop for PrivateKey {
-    #[inline(always)]
-    fn drop(&mut self) {
-        use zeroize::Zeroize;
-        self.zeroize()
     }
 }
 
