@@ -76,15 +76,9 @@ compile_error!("One of the features \"picnic\" and \"picnic3\" is required.");
 extern crate alloc;
 
 #[cfg(not(feature = "std"))]
-use alloc::{
-    fmt::{self, Debug},
-    format, vec,
-    vec::Vec,
-};
+use alloc::{format, vec, vec::Vec};
 
-#[cfg(feature = "std")]
-use std::fmt::{self, Debug};
-
+use core::fmt::{self, Debug};
 use core::marker::PhantomData;
 use paste::paste;
 use picnic_sys::*;
