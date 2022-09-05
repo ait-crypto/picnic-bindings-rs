@@ -39,3 +39,6 @@ system = ["dep:pkg-config"]
 static-fallback = ["dep:cc"]
 # Add parameter set-specfic mappings
 param-bindings = ["dep:paste"]
+
+[package.metadata.docs.rs]
+all-features = true
