@@ -130,9 +130,8 @@ pub trait RawVerifier {
 }
 
 /// Define a parameters set and its associated implementations and types
-// $realparam should be replaced by [<picnic_params_t:: $param>] but that does not compile.
 macro_rules! define_params {
-    ($name:ident, $param:ident, $realparam:expr) => {
+    ($name:ident, $param:ident) => {
         paste! {
             #[doc = $name " parameters"]
             #[derive(Clone, Debug, PartialEq, Eq)]
@@ -140,7 +139,7 @@ macro_rules! define_params {
             pub struct $name {}
 
             impl Parameters for $name {
-                const PARAM: picnic_params_t = $realparam;
+                const PARAM: picnic_params_t = picnic_params_t::$param;
                 const MAX_SIGNATURE_SIZE: usize = [<PICNIC_SIGNATURE_SIZE_ $param>];
                 const PRIVATE_KEY_SIZE: usize = [<PICNIC_PRIVATE_KEY_SIZE_ $param>];
                 const PUBLIC_KEY_SIZE: usize = [<PICNIC_PUBLIC_KEY_SIZE_ $param>];
@@ -160,43 +159,31 @@ macro_rules! define_params {
 }
 
 #[cfg(feature = "picnic")]
-define_params!(PicnicL1FS, Picnic_L1_FS, picnic_params_t::Picnic_L1_FS);
+define_params!(PicnicL1FS, Picnic_L1_FS);
 #[cfg(feature = "unruh-transform")]
-define_params!(PicnicL1UR, Picnic_L1_UR, picnic_params_t::Picnic_L1_UR);
+define_params!(PicnicL1UR, Picnic_L1_UR);
 #[cfg(feature = "picnic")]
-define_params!(
-    PicnicL1Full,
-    Picnic_L1_full,
-    picnic_params_t::Picnic_L1_full
-);
+define_params!(PicnicL1Full, Picnic_L1_full);
 #[cfg(feature = "picnic3")]
-define_params!(Picnic3L1, Picnic3_L1, picnic_params_t::Picnic3_L1);
+define_params!(Picnic3L1, Picnic3_L1);
 
 #[cfg(feature = "picnic")]
-define_params!(PicnicL3FS, Picnic_L3_FS, picnic_params_t::Picnic_L3_FS);
+define_params!(PicnicL3FS, Picnic_L3_FS);
 #[cfg(feature = "unruh-transform")]
-define_params!(PicnicL3UR, Picnic_L3_UR, picnic_params_t::Picnic_L3_UR);
+define_params!(PicnicL3UR, Picnic_L3_UR);
 #[cfg(feature = "picnic")]
-define_params!(
-    PicnicL3Full,
-    Picnic_L3_full,
-    picnic_params_t::Picnic_L3_full
-);
+define_params!(PicnicL3Full, Picnic_L3_full);
 #[cfg(feature = "picnic3")]
-define_params!(Picnic3L3, Picnic3_L3, picnic_params_t::Picnic3_L3);
+define_params!(Picnic3L3, Picnic3_L3);
 
 #[cfg(feature = "picnic")]
-define_params!(PicnicL5FS, Picnic_L5_FS, picnic_params_t::Picnic_L5_FS);
+define_params!(PicnicL5FS, Picnic_L5_FS);
 #[cfg(feature = "unruh-transform")]
-define_params!(PicnicL5UR, Picnic_L5_UR, picnic_params_t::Picnic_L5_UR);
+define_params!(PicnicL5UR, Picnic_L5_UR);
 #[cfg(feature = "picnic")]
-define_params!(
-    PicnicL5Full,
-    Picnic_L5_full,
-    picnic_params_t::Picnic_L5_full
-);
+define_params!(PicnicL5Full, Picnic_L5_full);
 #[cfg(feature = "picnic3")]
-define_params!(Picnic3L5, Picnic3_L5, picnic_params_t::Picnic3_L5);
+define_params!(Picnic3L5, Picnic3_L5);
 
 /// Signature stored in a `Vec`
 ///
