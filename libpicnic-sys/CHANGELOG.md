@@ -3,6 +3,8 @@
 ## 0.1.0+3.0.18 (2022-09-26)
 
 * Rework the crate to follow the typical pattern for `-sys` crates.
+* Change versioning to `crate+embedded Picnic` version to get some room for ABI breaking changes.
+* Drop `zeroize` feature.
 
 ## 3.0.18 (2022-09-05)
 
