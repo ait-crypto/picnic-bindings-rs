@@ -1,8 +1,8 @@
 # Changelog
 
-## 3.0.19 (2022-09-26)
+## 0.1.0+3.0.18 (2022-09-26)
 
-* Deprecate this crate. Please use `libpicnic-sys` instead.
+* Rework the crate to follow the typical pattern for `-sys` crates.
 
 ## 3.0.18 (2022-09-05)
 

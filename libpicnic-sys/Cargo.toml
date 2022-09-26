@@ -1,0 +1,41 @@
+[package]
+name = "libpicnic-sys"
+description = "Declarations for using Picnic's shared library"
+version = "0.1.0+3.0.18"
+authors = ["Sebastian Ramacher <sebastian.ramacher@ait.ac.at>"]
+homepage = "https://microsoft.github.io/Picnic/"
+repository = "https://github.com/ait-crypto/picnic-bindings-rs"
+license = "MIT"
+edition = "2021"
+rust-version = "1.60"
+links = "picnic"
+categories = ["external-ffi-bindings"]
+
+[dependencies]
+libc = { version = "0.2", default-features = false }
+paste = { version = "1", optional = true }
+
+[build-dependencies]
+pkg-config = { version = "0.3", optional = true }
+cc = { version = "1", optional = true, features = ["parallel"] }
+
+[dev-dependencies]
+hex = { version = "0.4", default-features = false, features = ["alloc"] }
+
+[features]
+default = ["system", "vendored", "picnic", "picnic3"]
+# Enable Picnic parameter sets
+picnic = []
+# Enable Picnic3 parameter sets
+picnic3 = []
+# Enable Picnic parameter sets with Unruh transform
+unruh-transform = ["picnic"]
+# Look for libpicnic via pkg-config
+system = ["dep:pkg-config"]
+# Use vendored copy of libpicnic if system library not found
+vendored = ["dep:cc"]
+# Add parameter set-specfic mappings
+param-bindings = ["dep:paste"]
+
+[package.metadata.docs.rs]
+all-features = true

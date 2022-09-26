@@ -1,4 +1,4 @@
-use picnic_sys::{
+use libpicnic_sys::{
     picnic_get_private_key_param, picnic_get_public_key_param, picnic_get_public_key_size,
     picnic_params_t, picnic_privatekey_t, picnic_publickey_t, picnic_read_private_key,
     picnic_read_public_key, picnic_sign, picnic_signature_size, picnic_sk_to_pk,

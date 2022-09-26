@@ -1,3 +1,3 @@
-[submodule "picnic-sys/Picnic"]
-	path = picnic-sys/Picnic
+[submodule "libpicnic-sys/Picnic"]
+	path = libpicnic-sys/Picnic
 	url = https://github.com/IAIK/Picnic.git

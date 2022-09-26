@@ -80,8 +80,8 @@ use alloc::{format, vec, vec::Vec};
 
 use core::fmt::{self, Debug};
 use core::marker::PhantomData;
+use libpicnic_sys::*;
 use paste::paste;
-use picnic_sys::*;
 pub use signature::{self, Error, Signer, Verifier};
 
 #[cfg(feature = "serialization")]

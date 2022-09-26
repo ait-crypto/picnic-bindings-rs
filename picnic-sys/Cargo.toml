@@ -1,44 +1,31 @@
 [package]
 name = "picnic-sys"
 description = "Declarations for using Picnic's shared library"
-version = "3.0.18"
+version = "3.0.19"
 authors = ["Sebastian Ramacher <sebastian.ramacher@ait.ac.at>"]
 homepage = "https://microsoft.github.io/Picnic/"
 repository = "https://github.com/ait-crypto/picnic-bindings-rs"
 license = "MIT"
 edition = "2021"
-rust-version = "1.60"
-links = "picnic"
+rust-version = "1.56"
 categories = ["external-ffi-bindings"]
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
-libc = { version = "0.2", default-features = false }
-paste = { version = "1", optional = true }
-zeroize = { version = "1.5", optional = true, default-features = false, features = [
-    "derive",
-] }
-
-[build-dependencies]
-pkg-config = { version = "0.3", optional = true }
-cc = { version = "1", optional = true, features = ["parallel"] }
-
-[dev-dependencies]
-hex = { version = "0.4", default-features = false, features = ["alloc"] }
+libpicnic-sys = { path = "../libpicnic-sys", version = "0.1", default-features = false }
 
 [features]
 default = ["system", "static-fallback", "picnic", "picnic3"]
 # Enable Picnic parameter sets
-picnic = []
+picnic = ["libpicnic-sys/picnic"]
 # Enable Picnic3 parameter sets
-picnic3 = []
+picnic3 = ["libpicnic-sys/picnic3"]
 # Enable Picnic parameter sets with Unruh transform
-unruh-transform = ["picnic"]
+unruh-transform = ["libpicnic-sys/unruh-transform"]
 # Look for libpicnic via pkg-config
-system = ["dep:pkg-config"]
+system = ["libpicnic-sys/system"]
 # Build libpicnic if not found
-static-fallback = ["dep:cc"]
+static-fallback = ["libpicnic-sys/vendored"]
 # Add parameter set-specfic mappings
-param-bindings = ["dep:paste"]
-
-[package.metadata.docs.rs]
-all-features = true
+param-bindings = ["libpicnic-sys/param-bindings"]

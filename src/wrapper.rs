@@ -1,7 +1,7 @@
 //! This module provides a very thin wrappers and contains all the unsafe calls
 //! to the Picnic implementation.
 
-use picnic_sys::*;
+use libpicnic_sys::*;
 use signature::Error;
 
 #[cfg(feature = "zeroize")]

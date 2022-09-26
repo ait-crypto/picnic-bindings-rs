@@ -1,4 +1,4 @@
-#[cfg(feature = "static-fallback")]
+#[cfg(feature = "vendored")]
 fn build() {
     use std::collections::HashSet;
     use std::env;
@@ -189,9 +189,9 @@ fn main() {
         }
     }
 
-    #[cfg(feature = "static-fallback")]
+    #[cfg(feature = "vendored")]
     // Download and build static library
     build();
-    #[cfg(not(feature = "static-fallback"))]
-    panic!("Unable to find library with pkg-config and static-fallback is not enabled!")
+    #[cfg(not(feature = "vendored"))]
+    panic!("Unable to find library with pkg-config and vendored is not enabled!")
 }
