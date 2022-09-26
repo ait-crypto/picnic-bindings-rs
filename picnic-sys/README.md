@@ -1,6 +1,6 @@
 # Declarations for the Picnic digital signature scheme
 
-This crate is deprecated. Please use [libpicnic-sys](https://crate.io/crates/libpicnic-sys) instead.
+This crate is deprecated. Please use [libpicnic-sys](https://crates.io/crates/libpicnic-sys) instead.
 
 ## License
 
