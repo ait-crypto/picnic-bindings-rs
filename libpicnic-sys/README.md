@@ -10,10 +10,9 @@ This crate supports the following features:
 * `param-bindings`: Produce bindings for parameter set specific functions.
 * `picnic3` (default): Enable Picnic3 parameter sets.
 * `picnic` (default): Enable Picnic parameter sets.
-* `static-fallback` (default): Build static `libpicnic` library if not found otherwise.
+* `vendored` (default): Use vendored copy of `libpicnic` library if not found otherwise.
 * `system` (default): Check for `libpicnic` via `pkg-config`.
 * `unruh-transform`: Enable Picnic parameter sets with Unruh transform.
-* `zeroize`: Implement zeroization of private keys via `Zeroize` and `ZeroizeOnDrop`.
 
 ## License
 
