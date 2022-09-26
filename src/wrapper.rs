@@ -24,7 +24,6 @@ pub(crate) trait PicnicKey {
 
 /// Newtype pattern for `picnic_privatekey_t`
 #[derive(Clone)]
-#[cfg_attr(feature = "zeroize", derive(Zeroize, ZeroizeOnDrop))]
 pub(crate) struct PrivateKey(picnic_privatekey_t);
 
 impl PrivateKey {
@@ -77,15 +76,27 @@ impl Default for PrivateKey {
     }
 }
 
-#[cfg(not(feature = "zeroize"))]
+#[cfg(feature = "zeroize")]
+impl Zeroize for PrivateKey {
+    fn zeroize(&mut self) {
+        self.0.data.zeroize();
+    }
+}
+
 impl Drop for PrivateKey {
     #[inline(always)]
     fn drop(&mut self) {
+        #[cfg(feature = "zeroize")]
+        self.zeroize();
+        #[cfg(not(feature = "zeroize"))]
         unsafe {
             picnic_clear_private_key(self.as_mut());
         }
     }
 }
+
+#[cfg(feature = "zeroize")]
+impl ZeroizeOnDrop for PrivateKey {}
 
 impl AsMut<picnic_privatekey_t> for PrivateKey {
     #[inline(always)]

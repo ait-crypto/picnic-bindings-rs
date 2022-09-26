@@ -12,7 +12,7 @@ keywords = ["signatures", "Picnic"]
 categories = ["cryptography", "api-bindings", "no-std"]
 
 [dependencies]
-picnic-sys = { version = "3.0.18", path = "picnic-sys", default-features = false }
+libpicnic-sys = { version = "0.1", path = "libpicnic-sys", default-features = false }
 signature = { version = "1.3", default-features = false }
 paste = "1.0"
 subtle = { version = "2.4", optional = true, default-features = false }
@@ -36,14 +36,14 @@ members = ["libpicnic-sys", "picnic-sys"]
 
 [features]
 default = ["std", "system", "static-fallback", "picnic", "picnic3"]
-picnic = ["picnic-sys/picnic"]
-picnic3 = ["picnic-sys/picnic3"]
-unruh-transform = ["picnic-sys/unruh-transform"]
-system = ["picnic-sys/system"]
-static-fallback = ["picnic-sys/static-fallback"]
+picnic = ["libpicnic-sys/picnic"]
+picnic3 = ["libpicnic-sys/picnic3"]
+unruh-transform = ["libpicnic-sys/unruh-transform"]
+system = ["libpicnic-sys/system"]
+static-fallback = ["libpicnic-sys/vendored"]
 std = ["signature/std"]
 serialization = ["dep:serde", "dep:serde_bytes"]
-zeroize = ["dep:zeroize", "picnic-sys/zeroize"]
+zeroize = ["dep:zeroize"]
 
 [package.metadata.docs.rs]
 all-features = true
