@@ -32,7 +32,7 @@ serde_json = "1.0"
 serde-bytes-repr = "0.1"
 
 [workspace]
-members = ["libpicnic-sys", "picnic-sys"]
+members = ["libpicnic-sys"]
 
 [features]
 default = ["std", "system", "static-fallback", "picnic", "picnic3"]
