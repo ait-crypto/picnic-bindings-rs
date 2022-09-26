@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.20 (2022-09-26)
+
+* Fix links to `libpicnic-sys`.
+
 ## 3.0.19 (2022-09-26)
 
 * Deprecate this crate. Please use `libpicnic-sys` instead.
