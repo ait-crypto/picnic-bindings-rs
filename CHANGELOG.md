@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2 (2022-09-26)
+
+* Switch to `libpicnic-sys`
+
 ## 0.5.1 (2022-08-31)
 
 * Add optional dependency in `zeroize` and implement `Zeroize` and `ZeroizeOnDrop` for private keys.
