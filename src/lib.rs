@@ -204,12 +204,6 @@ impl From<&[u8]> for DynamicSignature {
     }
 }
 
-impl signature::Signature for DynamicSignature {
-    fn from_bytes(bytes: &[u8]) -> Result<Self, Error> {
-        Ok(Self::from(bytes))
-    }
-}
-
 /// Signing key generic over the parameters
 #[derive(Clone)]
 #[cfg_attr(feature = "zeroize", derive(Zeroize, ZeroizeOnDrop))]
