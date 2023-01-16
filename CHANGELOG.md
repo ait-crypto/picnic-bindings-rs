@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6 (2023-01-16)
+
+* Update to `signature` 2.0.
+
 ## 0.5.2 (2022-09-26)
 
 * Switch to `libpicnic-sys`
