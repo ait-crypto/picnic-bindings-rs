@@ -79,10 +79,12 @@ jobs:
         with:
           targets: ${{matrix.target}}
       - uses: Swatinem/rust-cache@v2
+      - name: Install cross
+        run: cargo install cross
       - name: Test with default features
-        run: cargo test --workspace --target ${{matrix.target}}
+        run: cross test --workspace --target ${{matrix.target}}
       - name: Test with all features
-        run: cargo test --all-features --workspace --target ${{matrix.target}}
+        run: cross test --all-features --workspace --target ${{matrix.target}}
 
   fmt:
     name: Rustfmt
