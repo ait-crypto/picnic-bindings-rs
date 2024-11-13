@@ -29,7 +29,6 @@
 //! ```
 //! # #[cfg(feature="picnic")] {
 //! use picnic_bindings::{PicnicL1FSSigningKey};
-//! use std::convert::TryFrom;
 //!
 //! let (signing_key, verification_key) = PicnicL1FSSigningKey::random().expect("Key generation failed");
 //! let signing_key_2 = PicnicL1FSSigningKey::try_from(signing_key.as_ref()).expect("Deserialization failed");
