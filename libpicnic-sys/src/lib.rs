@@ -168,7 +168,7 @@ macro_rules! define_types_and_functions {
                 pub data: [u8; [<PICNIC_PRIVATE_KEY_SIZE_ $param>] - 1],
             }
 
-            extern "system" {
+            unsafe extern "system" {
                 pub fn [<$param:lower _get_param_name>]() -> *const c_char;
                 pub fn [<$param:lower _get_private_key_size>]() -> size_t;
                 pub fn [<$param:lower _get_public_key_size>]() -> size_t;
