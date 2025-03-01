@@ -94,7 +94,7 @@ pub struct picnic_privatekey_t {
     pub data: [u8; PICNIC_MAX_PRIVATEKEY_SIZE],
 }
 
-extern "system" {
+unsafe extern "system" {
     pub fn picnic_get_param_name(parameters: picnic_params_t) -> *const c_char;
     pub fn picnic_get_private_key_size(parameters: picnic_params_t) -> size_t;
     pub fn picnic_get_public_key_size(parameters: picnic_params_t) -> size_t;
