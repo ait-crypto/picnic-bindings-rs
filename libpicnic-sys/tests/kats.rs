@@ -1,8 +1,8 @@
 use libpicnic_sys::{
-    picnic_get_private_key_param, picnic_get_public_key_param, picnic_get_public_key_size,
-    picnic_params_t, picnic_privatekey_t, picnic_publickey_t, picnic_read_private_key,
-    picnic_read_public_key, picnic_sign, picnic_signature_size, picnic_sk_to_pk,
-    picnic_validate_keypair, picnic_verify, PICNIC_MAX_PRIVATEKEY_SIZE, PICNIC_MAX_PUBLICKEY_SIZE,
+    PICNIC_MAX_PRIVATEKEY_SIZE, PICNIC_MAX_PUBLICKEY_SIZE, picnic_get_private_key_param,
+    picnic_get_public_key_param, picnic_get_public_key_size, picnic_params_t, picnic_privatekey_t,
+    picnic_publickey_t, picnic_read_private_key, picnic_read_public_key, picnic_sign,
+    picnic_signature_size, picnic_sk_to_pk, picnic_validate_keypair, picnic_verify,
 };
 
 #[derive(Default, Clone)]

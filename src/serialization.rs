@@ -10,8 +10,8 @@ use std::fmt;
 
 use core::marker::PhantomData;
 use serde::{
-    de::{Error, Unexpected, Visitor},
     Deserializer, Serializer,
+    de::{Error, Unexpected, Visitor},
 };
 
 /// Serialize a value as bytes

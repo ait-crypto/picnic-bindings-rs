@@ -135,7 +135,7 @@ mod tests {
     #[cfg(feature = "serialization")]
     mod serialization_helpers {
         use super::*;
-        pub(crate) use serde::{de::DeserializeOwned, Deserialize, Serialize};
+        pub(crate) use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
         #[derive(Debug, Eq, PartialEq, Serialize, Deserialize)]
         pub(crate) struct KeyPair<P: Parameters> {
