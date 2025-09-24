@@ -10,7 +10,7 @@
 
 pub use libc::{c_char, c_int, size_t};
 #[cfg(feature = "param-bindings")]
-use paste::paste;
+use pastey::paste;
 
 pub const LOWMC_BLOCK_SIZE_Picnic_L1_FS: usize = 16;
 pub const LOWMC_BLOCK_SIZE_Picnic_L1_UR: usize = 16;

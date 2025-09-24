@@ -13,7 +13,7 @@ categories = ["external-ffi-bindings"]
 
 [dependencies]
 libc = { version = "0.2", default-features = false }
-paste = { version = "1", optional = true }
+pastey = { version = "0.1", optional = true }
 
 [build-dependencies]
 pkg-config = { version = "0.3", optional = true }
@@ -35,7 +35,7 @@ system = ["dep:pkg-config"]
 # Use vendored copy of libpicnic if system library not found
 vendored = ["dep:cc"]
 # Add parameter set-specfic mappings
-param-bindings = ["dep:paste"]
+param-bindings = ["dep:pastey"]
 
 [package.metadata.docs.rs]
 all-features = true
