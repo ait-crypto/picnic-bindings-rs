@@ -13,7 +13,6 @@ fn build() {
     let target_cpu = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
 
     let mut build = cc::Build::new();
-    build.static_flag(true);
     build.flag_if_supported("-std=gnu11");
     build.flag_if_supported("-fstack-protector-strong");
     build.define("_FORTIFY_SOURCE", Some("2"));
