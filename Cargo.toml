@@ -14,7 +14,7 @@ categories = ["cryptography", "api-bindings", "no-std"]
 [dependencies]
 libpicnic-sys = { version = "0.1", path = "libpicnic-sys", default-features = false }
 signature = { version = "2.0", default-features = false }
-pastey = "0.1"
+pastey = "0.2"
 subtle = { version = "2.4", optional = true, default-features = false }
 serde = { version = "1.0", optional = true, default-features = false, features = [
     "derive",
