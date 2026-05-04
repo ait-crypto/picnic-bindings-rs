@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1+3.0.18 (2026-05-04)
+
+* Switch to `pastey`.
+* Bump edition to 2024.
+
 ## 0.1.0+3.0.18 (2022-09-26)
 
 * Rework the crate to follow the typical pattern for `-sys` crates.
