@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7 (2026-05-03)
+
+* Update to `signature` 3.0.
+* Bump edition to 2024.
+
 ## 0.6 (2023-01-16)
 
 * Update to `signature` 2.0.
